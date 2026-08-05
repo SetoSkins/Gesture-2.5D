@@ -45,6 +45,16 @@
       font-size: 18px; font-weight: 700;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+    .logo::before {
+      content: '\270B';
+      position: absolute; left: -8px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 28px;
+      -webkit-text-fill-color: initial;
+      opacity: 0.5;
+      pointer-events: none;
     }
     .logo-icon {
       width: 32px; height: 32px;
