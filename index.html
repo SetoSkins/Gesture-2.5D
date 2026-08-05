@@ -210,21 +210,7 @@
       background: var(--bg); overflow: hidden;
     }
     .canvas-area.mobile-hidden { display: none; }
-    .render-stage {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
     .canvas-area canvas { display: block; }
-    .mobile-stage-title {
-      display: none;
-      margin-bottom: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
 
     .mobile-only { display: none; }
 
@@ -272,75 +258,16 @@
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(10,10,15,0.92);
       display: none; flex-direction: column;
-      align-items: center; justify-content: center; gap: 20px; z-index: 60;
+      align-items: center; justify-content: center; gap: 16px; z-index: 60;
     }
     .loading-overlay.visible { display: flex; }
-    .loading-ring-wrap {
-      position: relative;
-      width: 72px; height: 72px;
-    }
     .loading-ring {
-      position: absolute; top: 0; left: 0;
-      width: 72px; height: 72px;
-      border: 4px solid var(--rule); border-top-color: var(--accent);
+      width: 48px; height: 48px;
+      border: 3px solid var(--rule); border-top-color: var(--accent);
       border-radius: 50%; animation: spin 1s linear infinite;
     }
-    .loading-ring-inner {
-      position: absolute; top: 12px; left: 12px;
-      width: 48px; height: 48px;
-      border: 3px solid transparent; border-top-color: var(--accent2);
-      border-radius: 50%; animation: spin 0.7s linear infinite reverse;
-    }
-    .loading-ring-glow {
-      position: absolute; top: -8px; left: -8px;
-      width: 88px; height: 88px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.1); }
-    }
-    .loading-text { font-size: 15px; color: var(--muted); font-weight: 500; }
-    .loading-hint { font-size: 12px; color: var(--muted); opacity: 0.5; }
-    .loading-progress {
-      width: 200px; height: 4px;
-      background: var(--rule); border-radius: 2px;
-      overflow: hidden; margin-top: 4px;
-    }
-    .loading-progress-bar {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-    @media (max-width: 600px) {
-      .loading-overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(10,10,15,0.95);
-        z-index: 999;
-      }
-      .loading-ring-wrap {
-        width: 96px; height: 96px;
-      }
-      .loading-ring {
-        width: 96px; height: 96px;
-        border-width: 5px;
-      }
-      .loading-ring-inner {
-        top: 16px; left: 16px;
-        width: 64px; height: 64px;
-        border-width: 4px;
-      }
-      .loading-ring-glow {
-        top: -12px; left: -12px;
-        width: 120px; height: 120px;
-      }
-      .loading-text { font-size: 16px; }
-      .loading-hint { font-size: 13px; }
-      .loading-progress { width: 240px; height: 5px; }
-    }
+    .loading-text { font-size: 14px; color: var(--muted); }
+    .loading-hint { font-size: 11px; color: var(--muted); opacity: 0.5; }
 
     /* Toast */
     .toast {
@@ -362,30 +289,12 @@
     @media (max-width: 600px) {
       .main { flex-direction: column; }
       .sidebar { width: 100%; min-width: auto; flex: 1; max-height: none; border-right: none; border-bottom: none; }
-      .canvas-area {
-        order: -1;
-        flex: none;
-        height: auto;
-        min-height: 0;
-        padding: 14px 14px 0;
-        background: transparent;
-        display: block;
-        border-bottom: none;
-      }
+      .canvas-area { order: -1; flex: none; height: 34vh; min-height: 240px; border-bottom: 1px solid var(--rule); }
       .canvas-area.mobile-hidden { display: none; }
-      .render-stage {
-        height: auto;
-        aspect-ratio: var(--mobile-stage-aspect, 1 / 1);
-        border: 1px solid var(--rule);
-        border-radius: var(--radius);
-        overflow: hidden;
-        background: var(--bg);
-      }
       .header-actions { display: none; }
       .panel-camera { display: none; }
       .panel-ai { display: none; }
       .mobile-only { display: block; }
-      .mobile-stage-title { display: block; }
       .welcome { padding: 24px 16px; }
       .welcome h2 { font-size: 18px; }
       .welcome p { font-size: 13px; }
@@ -394,7 +303,7 @@
       .panel { padding: 14px; }
       .panel-title { margin-bottom: 10px; }
       .btn { padding: 10px 16px; font-size: 13px; }
-      .hud { display: none !important; }
+      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
       .welcome { display: none; }
     }
 
@@ -546,34 +455,26 @@
     </aside>
 
     <section class="canvas-area" id="canvasArea">
-      <div class="mobile-stage-title mobile-only" id="mobileStageTitle">手势控制 2.5D 图像生成器页面</div>
-      <div class="render-stage" id="renderStage">
-        <div class="welcome" id="welcomeScreen">
-          <div class="welcome-icon">&#9995;</div>
-          <h2>手势控制 2.5D 图像生成器</h2>
-          <p>上传一张静态图片，AI 将自动生成深度图并将其转化为 2.5D 动态效果。通过手势抓取/释放来控制视角，感受图像的立体深度。</p>
-          <div class="welcome-steps">
-            <div class="welcome-step"><div class="step-num">1</div><div class="step-text">上传图片</div></div>
-            <div class="welcome-step"><div class="step-num">2</div><div class="step-text">生成深度图</div></div>
-            <div class="welcome-step"><div class="step-num">3</div><div class="step-text">手势控制视角</div></div>
-          </div>
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-icon">&#9995;</div>
+        <h2>手势控制 2.5D 图像生成器</h2>
+        <p>上传一张静态图片，AI 将自动生成深度图并将其转化为 2.5D 动态效果。通过手势抓取/释放来控制视角，感受图像的立体深度。</p>
+        <div class="welcome-steps">
+          <div class="welcome-step"><div class="step-num">1</div><div class="step-text">上传图片</div></div>
+          <div class="welcome-step"><div class="step-num">2</div><div class="step-text">生成深度图</div></div>
+          <div class="welcome-step"><div class="step-num">3</div><div class="step-text">手势控制视角</div></div>
         </div>
-        <canvas id="threeCanvas" style="display:none;"></canvas>
-        <div class="hud" id="hud" style="display:none;">
-          <div class="hud-item"><div class="hud-dot off" id="hudDepth"></div><span>深度图</span></div>
-          <div class="hud-item"><div class="hud-dot off" id="hudCamera"></div><span>摄像头</span></div>
-          <div class="hud-item"><div class="hud-dot off" id="hudGesture"></div><span>手势</span></div>
-        </div>
-        <div class="loading-overlay" id="loadingOverlay">
-          <div class="loading-ring-wrap">
-            <div class="loading-ring-glow"></div>
-            <div class="loading-ring"></div>
-            <div class="loading-ring-inner"></div>
-          </div>
-          <div class="loading-text" id="loadingText">加载中...</div>
-          <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar"></div></div>
-          <div class="loading-hint" id="loadingHint"></div>
-        </div>
+      </div>
+      <canvas id="threeCanvas" style="display:none;"></canvas>
+      <div class="hud" id="hud" style="display:none;">
+        <div class="hud-item"><div class="hud-dot off" id="hudDepth"></div><span>深度图</span></div>
+        <div class="hud-item"><div class="hud-dot off" id="hudCamera"></div><span>摄像头</span></div>
+        <div class="hud-item"><div class="hud-dot off" id="hudGesture"></div><span>手势</span></div>
+      </div>
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-ring"></div>
+        <div class="loading-text" id="loadingText">加载中...</div>
+        <div class="loading-hint" id="loadingHint"></div>
       </div>
     </section>
   </main>
@@ -633,7 +534,6 @@
     const fileInput    = $('fileInput');
     const uploadPreview= $('uploadPreview');
     const canvasArea   = $('canvasArea');
-    const renderStage  = $('renderStage');
     const threeCanvas  = $('threeCanvas');
     const mobileControlPanel = $('mobileControlPanel');
     const webcam       = $('webcam');
@@ -868,8 +768,7 @@
 
     function resize() {
       updateMobileLayout();
-      const target = isMobileViewport() ? renderStage : canvasArea;
-      const r = target.getBoundingClientRect();
+      const r = canvasArea.getBoundingClientRect();
       if (!r.width || !r.height) return;
       renderer.setSize(r.width, r.height);
       camera.aspect = r.width / r.height;
@@ -1511,7 +1410,6 @@
       const mobile = isMobileViewport();
       canvasArea.classList.toggle('mobile-hidden', mobile && !S.depthReady);
       if (mobileControlPanel) mobileControlPanel.style.display = mobile && S.depthReady ? 'block' : 'none';
-      $('mobileStageTitle').style.display = mobile && S.depthReady ? 'block' : 'none';
       if (mobile && S.depthReady && !['touch', 'gyro'].includes(S.mode)) {
         setInteractionMode('touch', { silent: true });
       }
@@ -1617,7 +1515,6 @@
       const img = new Image();
       img.onload = () => {
         uploadPreview.src = url;
-        renderStage.style.setProperty('--mobile-stage-aspect', `${img.naturalWidth} / ${img.naturalHeight}`);
         uploadZone.classList.add('has-image');
         $('generateBtn').disabled = false;
         toast('图片加载成功，点击 "生成 2.5D 效果" 开始');
@@ -1636,9 +1533,7 @@
         depthPipeline = await pipeline('depth-estimation', 'Xenova/depth-anything-small-hf', {
           progress_callback: (p) => {
             if (p.status === 'progress') {
-              const pct = Math.round(p.progress || 0);
-              $('loadingText').textContent = `正在下载模型... ${pct}%`;
-              setLoadProgress(pct);
+              $('loadingText').textContent = `正在下载模型... ${Math.round(p.progress || 0)}%`;
             }
           }
         });
@@ -1713,7 +1608,7 @@
     function showScene() {
       $('welcomeScreen').style.display = 'none';
       threeCanvas.style.display = 'block';
-      $('hud').style.display = isMobileViewport() ? 'none' : 'flex';
+      $('hud').style.display = 'flex';
       updateMobileLayout();
       resize();
       buildPlane(uploadPreview, S.depthCanvas);
@@ -2050,11 +1945,7 @@
           AutoModel.from_pretrained('Xenova/lama', {
             device: 'wasm', dtype: 'fp32',
             progress_callback: (p) => {
-              if (p.status === 'progress') {
-                const pct = Math.round(p.progress || 0);
-                $('loadingText').textContent = '正在下载背景修复模型... ' + pct + '%';
-                setLoadProgress(pct);
-              }
+              if (p.status === 'progress') $('loadingText').textContent = '正在下载背景修复模型... ' + Math.round(p.progress || 0) + '%';
             }
           }),
           AutoProcessor.from_pretrained('Xenova/lama'),
@@ -2078,11 +1969,7 @@
           AutoModelForSemanticSegmentation.from_pretrained('Xenova/segformer-b0-finetuned-ade-512-512', {
             device: 'wasm', dtype: 'fp32',
             progress_callback: (p) => {
-              if (p.status === 'progress') {
-                const pct = Math.round(p.progress || 0);
-                $('loadingText').textContent = '正在下载语义分割模型... ' + pct + '%';
-                setLoadProgress(pct);
-              }
+              if (p.status === 'progress') $('loadingText').textContent = '正在下载语义分割模型... ' + Math.round(p.progress || 0) + '%';
             }
           }),
           AutoProcessor.from_pretrained('Xenova/segformer-b0-finetuned-ade-512-512'),
@@ -2455,13 +2342,9 @@
     function showLoad(t, h) {
       $('loadingText').textContent = t;
       $('loadingHint').textContent = h || '';
-      $('loadingProgressBar').style.width = '0%';
       $('loadingOverlay').classList.add('visible');
     }
     function hideLoad() { $('loadingOverlay').classList.remove('visible'); }
-    function setLoadProgress(pct) {
-      $('loadingProgressBar').style.width = Math.min(100, Math.max(0, pct)) + '%';
-    }
 
     let toastTimer;
     function toast(msg) {
