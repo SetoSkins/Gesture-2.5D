@@ -210,7 +210,21 @@
       background: var(--bg); overflow: hidden;
     }
     .canvas-area.mobile-hidden { display: none; }
+    .render-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
     .canvas-area canvas { display: block; }
+    .mobile-stage-title {
+      display: none;
+      margin-bottom: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
     .mobile-only { display: none; }
 
@@ -289,12 +303,30 @@
     @media (max-width: 600px) {
       .main { flex-direction: column; }
       .sidebar { width: 100%; min-width: auto; flex: 1; max-height: none; border-right: none; border-bottom: none; }
-      .canvas-area { order: -1; flex: none; height: 34vh; min-height: 240px; border-bottom: 1px solid var(--rule); }
+      .canvas-area {
+        order: -1;
+        flex: none;
+        height: auto;
+        min-height: 0;
+        padding: 14px 14px 0;
+        background: transparent;
+        display: block;
+        border-bottom: none;
+      }
       .canvas-area.mobile-hidden { display: none; }
+      .render-stage {
+        height: auto;
+        aspect-ratio: var(--mobile-stage-aspect, 1 / 1);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--bg);
+      }
       .header-actions { display: none; }
       .panel-camera { display: none; }
       .panel-ai { display: none; }
       .mobile-only { display: block; }
+      .mobile-stage-title { display: block; }
       .welcome { padding: 24px 16px; }
       .welcome h2 { font-size: 18px; }
       .welcome p { font-size: 13px; }
@@ -303,7 +335,7 @@
       .panel { padding: 14px; }
       .panel-title { margin-bottom: 10px; }
       .btn { padding: 10px 16px; font-size: 13px; }
-      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
+      .hud { display: none !important; }
       .welcome { display: none; }
     }
 
@@ -455,26 +487,29 @@
     </aside>
 
     <section class="canvas-area" id="canvasArea">
-      <div class="welcome" id="welcomeScreen">
-        <div class="welcome-icon">&#9995;</div>
-        <h2>手势控制 2.5D 图像生成器</h2>
-        <p>上传一张静态图片，AI 将自动生成深度图并将其转化为 2.5D 动态效果。通过手势抓取/释放来控制视角，感受图像的立体深度。</p>
-        <div class="welcome-steps">
-          <div class="welcome-step"><div class="step-num">1</div><div class="step-text">上传图片</div></div>
-          <div class="welcome-step"><div class="step-num">2</div><div class="step-text">生成深度图</div></div>
-          <div class="welcome-step"><div class="step-num">3</div><div class="step-text">手势控制视角</div></div>
+      <div class="mobile-stage-title mobile-only" id="mobileStageTitle">手势控制 2.5D 图像生成器页面</div>
+      <div class="render-stage" id="renderStage">
+        <div class="welcome" id="welcomeScreen">
+          <div class="welcome-icon">&#9995;</div>
+          <h2>手势控制 2.5D 图像生成器</h2>
+          <p>上传一张静态图片，AI 将自动生成深度图并将其转化为 2.5D 动态效果。通过手势抓取/释放来控制视角，感受图像的立体深度。</p>
+          <div class="welcome-steps">
+            <div class="welcome-step"><div class="step-num">1</div><div class="step-text">上传图片</div></div>
+            <div class="welcome-step"><div class="step-num">2</div><div class="step-text">生成深度图</div></div>
+            <div class="welcome-step"><div class="step-num">3</div><div class="step-text">手势控制视角</div></div>
+          </div>
         </div>
-      </div>
-      <canvas id="threeCanvas" style="display:none;"></canvas>
-      <div class="hud" id="hud" style="display:none;">
-        <div class="hud-item"><div class="hud-dot off" id="hudDepth"></div><span>深度图</span></div>
-        <div class="hud-item"><div class="hud-dot off" id="hudCamera"></div><span>摄像头</span></div>
-        <div class="hud-item"><div class="hud-dot off" id="hudGesture"></div><span>手势</span></div>
-      </div>
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-ring"></div>
-        <div class="loading-text" id="loadingText">加载中...</div>
-        <div class="loading-hint" id="loadingHint"></div>
+        <canvas id="threeCanvas" style="display:none;"></canvas>
+        <div class="hud" id="hud" style="display:none;">
+          <div class="hud-item"><div class="hud-dot off" id="hudDepth"></div><span>深度图</span></div>
+          <div class="hud-item"><div class="hud-dot off" id="hudCamera"></div><span>摄像头</span></div>
+          <div class="hud-item"><div class="hud-dot off" id="hudGesture"></div><span>手势</span></div>
+        </div>
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="loading-ring"></div>
+          <div class="loading-text" id="loadingText">加载中...</div>
+          <div class="loading-hint" id="loadingHint"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -534,6 +569,7 @@
     const fileInput    = $('fileInput');
     const uploadPreview= $('uploadPreview');
     const canvasArea   = $('canvasArea');
+    const renderStage  = $('renderStage');
     const threeCanvas  = $('threeCanvas');
     const mobileControlPanel = $('mobileControlPanel');
     const webcam       = $('webcam');
@@ -768,7 +804,8 @@
 
     function resize() {
       updateMobileLayout();
-      const r = canvasArea.getBoundingClientRect();
+      const target = isMobileViewport() ? renderStage : canvasArea;
+      const r = target.getBoundingClientRect();
       if (!r.width || !r.height) return;
       renderer.setSize(r.width, r.height);
       camera.aspect = r.width / r.height;
@@ -1410,6 +1447,7 @@
       const mobile = isMobileViewport();
       canvasArea.classList.toggle('mobile-hidden', mobile && !S.depthReady);
       if (mobileControlPanel) mobileControlPanel.style.display = mobile && S.depthReady ? 'block' : 'none';
+      $('mobileStageTitle').style.display = mobile && S.depthReady ? 'block' : 'none';
       if (mobile && S.depthReady && !['touch', 'gyro'].includes(S.mode)) {
         setInteractionMode('touch', { silent: true });
       }
@@ -1515,6 +1553,7 @@
       const img = new Image();
       img.onload = () => {
         uploadPreview.src = url;
+        renderStage.style.setProperty('--mobile-stage-aspect', `${img.naturalWidth} / ${img.naturalHeight}`);
         uploadZone.classList.add('has-image');
         $('generateBtn').disabled = false;
         toast('图片加载成功，点击 "生成 2.5D 效果" 开始');
@@ -1608,7 +1647,7 @@
     function showScene() {
       $('welcomeScreen').style.display = 'none';
       threeCanvas.style.display = 'block';
-      $('hud').style.display = 'flex';
+      $('hud').style.display = isMobileViewport() ? 'none' : 'flex';
       updateMobileLayout();
       resize();
       buildPlane(uploadPreview, S.depthCanvas);
