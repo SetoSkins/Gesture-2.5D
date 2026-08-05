@@ -1875,6 +1875,7 @@
     });
 
     $('generateBtn').addEventListener('click', async () => {
+      toast('生成中.....请等待30秒', 30000);
       if (!S.imageReady) {
         S.imageReady = true;
         await runDepth();
@@ -2347,12 +2348,12 @@
     function hideLoad() { $('loadingOverlay').classList.remove('visible'); }
 
     let toastTimer;
-    function toast(msg) {
+    function toast(msg, duration) {
       const el = $('toast');
       el.textContent = msg;
       el.classList.add('visible');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('visible'), 3000);
+      toastTimer = setTimeout(() => el.classList.remove('visible'), duration || 3000);
     }
 
     // ===================== INIT =====================
