@@ -1443,7 +1443,6 @@
     });
     canvasArea.addEventListener('touchstart', (e) => {
       if (S.mode !== 'touch' || !S.depthReady || !isMobileViewport()) return;
-      e.preventDefault();
       const rect = canvasArea.getBoundingClientRect();
       const t = e.touches[0];
       const cx = (t.clientX - rect.left) / rect.width;
@@ -1452,10 +1451,9 @@
       S.targetX = clamp((cx - 0.5) * 2, -1, 1) * S.sensitivity * 0.22;
       S.targetY = clamp((0.5 - cy) * 2, -1, 1) * S.sensitivity * 0.22;
       S.isGrabbing = true;
-    }, { passive: false });
+    }, { passive: true });
     canvasArea.addEventListener('touchmove', (e) => {
       if (S.mode !== 'touch' || !S.depthReady || !isMobileViewport()) return;
-      e.preventDefault();
       const rect = canvasArea.getBoundingClientRect();
       const t = e.touches[0];
       const cx = (t.clientX - rect.left) / rect.width;
@@ -1464,7 +1462,7 @@
       S.targetX = clamp((cx - 0.5) * 2, -1, 1) * S.sensitivity * 0.22;
       S.targetY = clamp((0.5 - cy) * 2, -1, 1) * S.sensitivity * 0.22;
       S.isGrabbing = true;
-    }, { passive: false });
+    }, { passive: true });
     ['touchend', 'touchcancel'].forEach(evt => {
       canvasArea.addEventListener(evt, () => {
         if (S.mode === 'touch') {
