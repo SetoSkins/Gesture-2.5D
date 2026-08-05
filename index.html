@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gesture 2.5D - 手势控制2.5D图像生成器</title>
   <style>
     :root {
@@ -25,7 +25,7 @@
       background: var(--bg);
       color: var(--ink);
       overflow: hidden;
-      height: 100vh; height: 100dvh;
+      height: 100vh;
       width: 100vw;
     }
 
@@ -56,7 +56,7 @@
     .header-actions { display: flex; align-items: center; gap: 12px; }
 
     /* Main */
-    .main { height: 100vh; height: 100dvh; padding-top: 56px; display: flex; }
+    .main { height: 100vh; padding-top: 56px; display: flex; }
 
     /* Sidebar */
     .sidebar {
@@ -78,10 +78,12 @@
       display: flex; align-items: center; gap: 8px;
     }
 
+    /* Upload */
     .upload-zone {
       border: 2px dashed var(--rule); border-radius: var(--radius);
       padding: 32px 20px; text-align: center; cursor: pointer;
       transition: all 0.3s ease; background: var(--surface);
+      position: relative; overflow: hidden;
     }
     .upload-zone:hover { border-color: var(--accent); background: rgba(108,92,231,0.05); }
     .upload-zone.dragover { border-color: var(--accent); background: rgba(108,92,231,0.1); transform: scale(1.01); }
@@ -94,6 +96,7 @@
     .upload-text strong { color: var(--accent); }
     #fileInput { display: none; }
 
+    /* Depth status */
     .depth-status {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 16px; background: var(--surface);
@@ -118,11 +121,12 @@
     .depth-preview-label { font-size: 11px; color: var(--muted); padding: 6px 10px; background: var(--surface); text-align: center; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Controls */
     .control-group { margin-bottom: 16px; }
     .control-group:last-child { margin-bottom: 0; }
     .control-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .control-label span { font-size: 13px; color: var(--ink); }
-    .control-label .value { font-size: 12px; color: var(--accent); font-weight: 600; }
+    .control-label .value { font-size: 12px; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 
     input[type="range"] {
       width: 100%; -webkit-appearance: none;
@@ -136,6 +140,7 @@
     }
     input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
+    /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
@@ -148,6 +153,7 @@
     .btn-secondary:hover { background: var(--bg3); }
     .btn-block { width: 100%; }
 
+    /* Camera */
     .camera-container {
       position: relative; width: 100%; aspect-ratio: 4/3;
       background: var(--bg); border-radius: var(--radius);
@@ -163,6 +169,7 @@
     .camera-placeholder .icon { font-size: 32px; opacity: 0.4; }
     .camera-placeholder span { font-size: 13px; }
 
+    /* Gesture indicator */
     .gesture-indicator {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       padding: 12px; background: var(--surface); border-radius: 8px;
@@ -183,6 +190,7 @@
     .gesture-name { font-size: 14px; font-weight: 600; }
     .gesture-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
+    /* Mode switch */
     .mode-switch {
       display: flex; background: var(--bg); border-radius: 8px;
       padding: 3px; border: 1px solid var(--rule);
@@ -195,6 +203,7 @@
     .mode-option.active { background: var(--accent); color: white; }
     .mode-option:hover:not(.active) { color: var(--ink); }
 
+    /* Canvas Area */
     .canvas-area {
       flex: 1; position: relative;
       display: flex; align-items: center; justify-content: center;
@@ -202,6 +211,7 @@
     }
     .canvas-area canvas { display: block; }
 
+    /* Welcome */
     .welcome { text-align: center; max-width: 480px; padding: 40px; }
     .welcome-icon {
       width: 80px; height: 80px; margin: 0 auto 20px;
@@ -227,6 +237,7 @@
     }
     .welcome-step .step-text { font-size: 12px; color: var(--muted); line-height: 1.4; }
 
+    /* HUD */
     .hud {
       position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 16px; align-items: center;
@@ -239,6 +250,7 @@
     .hud-dot.on { background: var(--accent2); }
     .hud-dot.off { background: var(--muted); opacity: 0.3; }
 
+    /* Loading */
     .loading-overlay {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(10,10,15,0.92);
@@ -254,6 +266,7 @@
     .loading-text { font-size: 14px; color: var(--muted); }
     .loading-hint { font-size: 11px; color: var(--muted); opacity: 0.5; }
 
+    /* Toast */
     .toast {
       position: fixed; top: 72px; left: 50%;
       transform: translateX(-50%) translateY(-20px);
@@ -264,6 +277,29 @@
     }
     .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 260px; min-width: 260px; }
+      .header-actions { display: none; }
+      .panel-camera { display: none; }
+    }
+    @media (max-width: 600px) {
+      .main { flex-direction: column; }
+      .sidebar { width: 100%; min-width: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid var(--rule); }
+      .header-actions { display: none; }
+      .panel-camera { display: none; }
+      .welcome { padding: 24px 16px; }
+      .welcome h2 { font-size: 18px; }
+      .welcome p { font-size: 13px; }
+      .welcome-steps { flex-direction: column; gap: 10px; }
+      .upload-text { font-size: 13px; }
+      .panel { padding: 14px; }
+      .panel-title { margin-bottom: 10px; }
+      .btn { padding: 10px 16px; font-size: 13px; }
+      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
+    }
+
+    /* Toggle Switch */
     .toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
@@ -279,6 +315,7 @@
     .toggle-switch input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
     .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); background: white; }
 
+    /* AI Status */
     .ai-status { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
     .ai-status-item {
       display: flex; align-items: center; gap: 8px;
@@ -288,52 +325,6 @@
     .ai-dot.ready { background: var(--accent2); }
     .ai-dot.loading { background: var(--accent3); animation: pulse 1s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-
-    /* Mobile bottom panel */
-    .mobile-controls-bar {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      z-index: 90; padding: 8px 12px;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-    .mobile-controls-bar.visible { display: flex; gap: 8px; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header { padding: 0 16px; height: 48px; }
-      .logo { font-size: 15px; }
-      .logo-icon { width: 28px; height: 28px; font-size: 14px; }
-      .header-actions { display: none; }
-      .main { padding-top: 48px; flex-direction: column; }
-      .sidebar {
-        width: 100%; min-width: auto; max-height: 100%;
-        border-right: none; border-bottom: 1px solid var(--rule);
-        flex-shrink: 0;
-      }
-      .panel { padding: 14px; }
-      .panel-camera { display: none; }
-      .upload-zone { padding: 20px 14px; }
-      .upload-text { font-size: 13px; }
-      .canvas-area { flex: 1; min-height: 0; }
-      .welcome { padding: 20px 16px; }
-      .welcome h2 { font-size: 18px; }
-      .welcome p { font-size: 13px; }
-      .welcome-steps { flex-direction: column; gap: 10px; }
-      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
-      .btn { padding: 10px 16px; font-size: 13px; }
-      .mobile-ctrl-btn {
-        flex: 1; padding: 10px 12px; border-radius: 10px;
-        font-size: 12px; font-weight: 600; text-align: center;
-        background: var(--bg2); border: 1px solid var(--rule);
-        color: var(--muted); cursor: pointer;
-      }
-      .mobile-ctrl-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-      .mobile-ctrl-btn.gyro-active { background: var(--accent2); color: var(--bg); border-color: var(--accent2); }
-      .sidebar.mobile-collapsed .panel:not(.panel-upload):not(.panel-generate) { display: none; }
-      .sidebar.mobile-collapsed .panel-generate { border-bottom: none; }
-      .sidebar.mobile-hidden { display: none; }
-      .canvas-area.mobile-full { flex: 1; min-height: 0; }
-    }
   </style>
 </head>
 <body>
@@ -352,9 +343,9 @@
   </header>
 
   <main class="main">
-    <aside class="sidebar mobile-collapsed" id="sidebar">
-      <!-- Upload - always visible -->
-      <div class="panel panel-upload">
+    <aside class="sidebar">
+      <!-- Upload -->
+      <div class="panel">
         <div class="panel-title"><span>&#128444;</span> 上传图片</div>
         <div class="upload-zone" id="uploadZone">
           <div class="upload-placeholder">
@@ -375,12 +366,7 @@
         </div>
       </div>
 
-      <!-- Generate button (mobile: visible in collapsed state) -->
-      <div class="panel panel-generate">
-        <button class="btn btn-primary btn-block" id="generateBtn" disabled>生成 2.5D 效果</button>
-      </div>
-
-      <!-- Camera (hidden on mobile) -->
+      <!-- Camera -->
       <div class="panel panel-camera">
         <div class="panel-title"><span>&#127909;</span> 摄像头手势</div>
         <div class="camera-container" id="cameraContainer">
@@ -401,7 +387,7 @@
         </div>
       </div>
 
-      <!-- Controls (hidden on mobile before generation) -->
+      <!-- Controls -->
       <div class="panel">
         <div class="panel-title"><span>&#9881;</span> 参数调整</div>
         <div class="control-group">
@@ -427,6 +413,7 @@
         </div>
       </div>
 
+      <!-- AI Features -->
       <div class="panel">
         <div class="panel-title"><span>&#129302;</span> AI 增强</div>
         <div class="control-group" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -443,9 +430,11 @@
         </div>
       </div>
 
+      <!-- Actions -->
       <div class="panel">
         <div class="panel-title"><span>&#127919;</span> 操作</div>
-        <button class="btn btn-secondary btn-block" id="resetBtn">重置视角</button>
+        <button class="btn btn-primary btn-block" id="generateBtn" disabled>生成 2.5D 效果</button>
+        <button class="btn btn-secondary btn-block" style="margin-top:8px;" id="resetBtn">重置视角</button>
       </div>
     </aside>
 
@@ -474,13 +463,6 @@
     </section>
   </main>
 
-  <!-- Mobile bottom controls bar -->
-  <div class="mobile-controls-bar" id="mobileBar">
-    <div class="mobile-ctrl-btn gyro-active" id="mbGyro" title="陀螺仪">陀螺仪</div>
-    <div class="mobile-ctrl-btn" id="mbTouch" title="触摸">触摸</div>
-    <div class="mobile-ctrl-btn" id="mbParams" title="参数">参数</div>
-  </div>
-
   <div class="toast" id="toast"></div>
 
   <script type="importmap">
@@ -495,435 +477,1074 @@
   <script type="module">
     import * as THREE from 'three';
 
-    const $ = id => document.getElementById(id);
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
+    // ===================== STATE =====================
     const S = {
-      imageReady: false,
-      depthReady: false,
+      mode: 'gesture',
+      gyroActive: false,
       cameraActive: false,
+      depthReady: false,
+      imageReady: false,
+      modelLoaded: false,
       isGrabbing: false,
       targetX: 0, targetY: 0,
-      currentX: 0, currentY: 0,
-      mode: 'gesture',
+      currX: 0, currY: 0,
       depthScale: 0.70,
       depthBias: 0.25,
       depthContrast: 1.0,
       sensitivity: 1.5,
       damping: 0.82,
-      image: null,
-      imageCanvas: null,
-      imageW: 0, imageH: 0,
+      imageUrl: null,
+      depthCanvas: null,
+      mattingModel: null,
+      mattingDims: null,
+      // AI增强功能
+      aiEnhanced: false,
+      autoParams: true,
+      inpaintReady: false,
+      segmentReady: false,
+      faceReady: false,
+      inpaintedBg: null,
+      segmentationData: null,
+      segmentationDims: null,
       faceLandmarks: null,
-      useGyro: false,
-      gyroBeta0: null,
-      gyroGamma0: null,
+      imageCanvas: null,
+      shadowCleanup: true,
+      tickFrame: 0,
     };
 
-    // Three.js
-    let scene, camera, renderer, planeBack, planeFront, particleSystem;
-    let threeCanvas = $('threeCanvas');
-    let renderAF = null;
+    // ===================== REFS =====================
+    const $ = (id) => document.getElementById(id);
+    const uploadZone   = $('uploadZone');
+    const fileInput    = $('fileInput');
+    const uploadPreview= $('uploadPreview');
+    const canvasArea   = $('canvasArea');
+    const threeCanvas  = $('threeCanvas');
+    const webcam       = $('webcam');
+    const gestureCv    = $('gestureCanvas');
+    const gCtx         = gestureCv.getContext('2d');
 
-    const gestureCv = $('gestureCanvas');
-    const gCtx = gestureCv.getContext('2d');
-    const webcam = $('webcam');
+    // ===================== THREE.JS =====================
+    let scene, camera, renderer, planeBack, planeFront, particles, particleData;
+    let smoothX = 0, smoothY = 0, tickRunning = false;
+    const DEADZONE = 0.008;
 
-    // ===================== HELPERS =====================
-    function toast(msg) {
-      const t = $('toast');
-      t.textContent = msg; t.classList.add('visible');
-      clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('visible'), 2500);
+    function initThree() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0f);
+      camera = new THREE.PerspectiveCamera(30, 1, 0.01, 10);
+      camera.position.z = 2;
+      renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      scene.add(new THREE.AmbientLight(0xffffff, 2));
+      const dl = new THREE.DirectionalLight(0xffffff, 1);
+      dl.position.set(0.5, 0.5, 1);
+      scene.add(dl);
+      resize();
+      window.addEventListener('resize', resize);
     }
 
-    function showLoading(text, hint) {
-      $('loadingText').textContent = text || '加载中...';
-      $('loadingHint').textContent = hint || '';
-      $('loadingOverlay').classList.add('visible');
+    function createParticleSystem() {
+      if (particles) { scene.remove(particles); particles.geometry.dispose(); particles.material.dispose(); }
+
+      // ── Cosmic particles: space dust + stars + rare flares ──
+      const DUST = 4000, STARS = 1400, FLARES = 100;
+      const COUNT = DUST + STARS + FLARES;
+      const geo = new THREE.BufferGeometry();
+      const positions = new Float32Array(COUNT * 3);
+      const colors = new Float32Array(COUNT * 3);
+      const sizes = new Float32Array(COUNT);
+
+      particleData = [];
+
+      // Cosmic palette: deep blues, purples, cyan, white, occasional warm gold
+      const cosmicBlue  = [[0.08, 0.30, 0.95], [0.12, 0.40, 1.0], [0.05, 0.25, 0.85]];
+      const cosmicPurple= [[0.30, 0.15, 0.95], [0.40, 0.20, 1.0], [0.35, 0.10, 0.85]];
+      const cosmicCyan  = [[0.0, 0.70, 0.85], [0.0, 0.80, 0.95], [0.05, 0.65, 0.80]];
+      const cosmicWhite = [[0.85, 0.88, 1.0], [0.75, 0.80, 0.95], [0.90, 0.92, 1.0]];
+      const cosmicGold  = [[0.95, 0.70, 0.20], [1.0, 0.80, 0.30], [0.90, 0.65, 0.15]];
+
+      // ── Layer 1: Space dust (tiny, dim, vast distribution) ──
+      for (let i = 0; i < DUST; i++) {
+        // Deep 3D distribution — like looking into deep space
+        const angle = Math.random() * Math.PI * 2;
+        const rx = 0.3 + Math.random() * 3.5;
+        const ry = 0.3 + Math.random() * 3.0;
+        const x = Math.cos(angle) * rx;
+        const y = Math.sin(angle) * ry;
+        const z = -2.0 + Math.random() * 4.0;  // Deep Z spread
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        // Mostly blue/purple space dust, very dim
+        const r = Math.random();
+        const palette = r < 0.45 ? cosmicBlue : r < 0.80 ? cosmicPurple : cosmicCyan;
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        const brightness = 0.08 + Math.random() * 0.25;  // Very dim
+        colors[i * 3]     = c[0] * brightness;
+        colors[i * 3 + 1] = c[1] * brightness;
+        colors[i * 3 + 2] = c[2] * brightness;
+
+        sizes[i] = 0.08 + Math.random() * 0.5;
+
+        particleData.push({
+          type: 'dust',
+          baseX: x, baseY: y, baseZ: z,
+          orbitRx: 0.0003 + Math.random() * 0.002,
+          orbitRy: 0.0003 + Math.random() * 0.002,
+          orbitRz: 0.0002 + Math.random() * 0.0015,
+          phaseX: Math.random() * Math.PI * 2,
+          phaseY: Math.random() * Math.PI * 2,
+          phaseZ: Math.random() * Math.PI * 2,
+          freqX: 0.15 + Math.random() * 0.4,
+          freqY: 0.1 + Math.random() * 0.4,
+          freqZ: 0.08 + Math.random() * 0.3,
+          driftY: (Math.random() - 0.5) * 0.00015,
+          baseSize: sizes[i],
+          pulsePhase: Math.random() * Math.PI * 2,
+          pulseFreq: 0.2 + Math.random() * 0.4,
+        });
+      }
+
+      // ── Layer 2: Stars (bright, twinkling, varied) ──
+      for (let i = DUST; i < DUST + STARS; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const rx = 0.2 + Math.random() * 3.0;
+        const ry = 0.2 + Math.random() * 2.5;
+        const x = Math.cos(angle) * rx;
+        const y = Math.sin(angle) * ry;
+        const z = -1.5 + Math.random() * 3.0;
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        // Stars: white/cyan dominant, occasional gold
+        const r = Math.random();
+        const palette = r < 0.45 ? cosmicWhite : r < 0.75 ? cosmicCyan : r < 0.92 ? cosmicBlue : cosmicGold;
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        const brightness = 0.4 + Math.random() * 0.6;
+        colors[i * 3]     = c[0] * brightness;
+        colors[i * 3 + 1] = c[1] * brightness;
+        colors[i * 3 + 2] = c[2] * brightness;
+
+        // Stars have varied sizes: small distant to large nearby
+        sizes[i] = 0.6 + Math.random() * 4.0;
+
+        // Twinkling: stronger pulse for stars
+        const twinkleStrength = 0.3 + Math.random() * 0.6;
+        particleData.push({
+          type: 'star',
+          baseX: x, baseY: y, baseZ: z,
+          orbitRx: 0.0005 + Math.random() * 0.003,
+          orbitRy: 0.0005 + Math.random() * 0.003,
+          orbitRz: 0.0003 + Math.random() * 0.002,
+          phaseX: Math.random() * Math.PI * 2,
+          phaseY: Math.random() * Math.PI * 2,
+          phaseZ: Math.random() * Math.PI * 2,
+          freqX: 0.08 + Math.random() * 0.2,
+          freqY: 0.06 + Math.random() * 0.2,
+          freqZ: 0.05 + Math.random() * 0.15,
+          driftY: (Math.random() - 0.5) * 0.0001,
+          baseSize: sizes[i],
+          pulsePhase: Math.random() * Math.PI * 2,
+          pulseFreq: 0.5 + Math.random() * 1.5,  // Faster twinkle
+          twinkleStrength: twinkleStrength,
+        });
+      }
+
+      // ── Layer 3: Rare bright flares (occasional cosmic bursts) ──
+      for (let i = DUST + STARS; i < COUNT; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const rx = 0.3 + Math.random() * 2.5;
+        const ry = 0.3 + Math.random() * 2.2;
+        const x = Math.cos(angle) * rx;
+        const y = Math.sin(angle) * ry;
+        const z = -1.0 + Math.random() * 2.0;
+
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        // Flares: bright white/cyan/gold
+        const r = Math.random();
+        const palette = r < 0.5 ? cosmicWhite : r < 0.8 ? cosmicCyan : cosmicGold;
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        const brightness = 0.8 + Math.random() * 0.2;
+        colors[i * 3]     = c[0] * brightness;
+        colors[i * 3 + 1] = c[1] * brightness;
+        colors[i * 3 + 2] = c[2] * brightness;
+
+        sizes[i] = 3.5 + Math.random() * 6.0;
+
+        particleData.push({
+          type: 'flare',
+          baseX: x, baseY: y, baseZ: z,
+          orbitRx: 0.0002 + Math.random() * 0.001,
+          orbitRy: 0.0002 + Math.random() * 0.001,
+          orbitRz: 0.0001 + Math.random() * 0.0008,
+          phaseX: Math.random() * Math.PI * 2,
+          phaseY: Math.random() * Math.PI * 2,
+          phaseZ: Math.random() * Math.PI * 2,
+          freqX: 0.04 + Math.random() * 0.1,
+          freqY: 0.03 + Math.random() * 0.1,
+          freqZ: 0.02 + Math.random() * 0.08,
+          driftY: (Math.random() - 0.5) * 0.00005,
+          baseSize: sizes[i],
+          pulsePhase: Math.random() * Math.PI * 2,
+          pulseFreq: 0.3 + Math.random() * 0.8,
+          twinkleStrength: 0.5 + Math.random() * 0.5,
+        });
+      }
+
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+      // ── Star glow sprite texture (sharp core + soft halo) ──
+      const spriteCanvas = document.createElement('canvas');
+      spriteCanvas.width = 128; spriteCanvas.height = 128;
+      const sctx = spriteCanvas.getContext('2d');
+
+      // Sharp bright core + soft glow halo (like a distant star)
+      const gradient = sctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gradient.addColorStop(0,    'rgba(255,255,255,1.0)');
+      gradient.addColorStop(0.02, 'rgba(255,255,255,1.0)');
+      gradient.addColorStop(0.06, 'rgba(255,255,255,0.90)');
+      gradient.addColorStop(0.15, 'rgba(255,255,255,0.55)');
+      gradient.addColorStop(0.30, 'rgba(255,255,255,0.18)');
+      gradient.addColorStop(0.50, 'rgba(255,255,255,0.04)');
+      gradient.addColorStop(0.70, 'rgba(255,255,255,0.005)');
+      gradient.addColorStop(1,    'rgba(255,255,255,0)');
+      sctx.fillStyle = gradient;
+      sctx.fillRect(0, 0, 128, 128);
+
+      // Add subtle diffraction spikes for brighter stars
+      sctx.globalCompositeOperation = 'lighter';
+      sctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      sctx.lineWidth = 0.5;
+      for (let a = 0; a < 4; a++) {
+        const rad = a * Math.PI / 4;
+        sctx.beginPath();
+        sctx.moveTo(64, 64);
+        sctx.lineTo(64 + Math.cos(rad) * 60, 64 + Math.sin(rad) * 60);
+        sctx.stroke();
+      }
+
+      const spriteTex = new THREE.CanvasTexture(spriteCanvas);
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.04,
+        map: spriteTex,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: true,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.75,
+      });
+
+      particles = new THREE.Points(geo, mat);
+      scene.add(particles);
     }
-    function hideLoading() { $('loadingOverlay').classList.remove('visible'); }
 
-    // ===================== UPLOAD =====================
-    const uploadZone = $('uploadZone');
-    const fileInput = $('fileInput');
-    const uploadPreview = $('uploadPreview');
+    function resize() {
+      const r = canvasArea.getBoundingClientRect();
+      renderer.setSize(r.width, r.height);
+      camera.aspect = r.width / r.height;
+      camera.updateProjectionMatrix();
+    }
 
-    uploadZone.addEventListener('click', () => fileInput.click());
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault(); uploadZone.classList.remove('dragover');
-      if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', () => { if (fileInput.files.length) loadImage(fileInput.files[0]); });
+    const parallaxVert = `
+      varying vec2 vUv;
+      varying vec3 vViewDirTS;
+      void main() {
+        vUv = uv;
+        vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+        vec3 viewDir = normalize(cameraPosition - worldPos);
+        vec3 T = normalize((modelMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz);
+        vec3 B = normalize((modelMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
+        vec3 N = normalize(cross(T, B));
+        mat3 TBN = mat3(T, B, N);
+        vViewDirTS = normalize(TBN * viewDir);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `;
 
-    function loadImage(file) {
-      if (!file.type.startsWith('image/')) { toast('请选择图片文件'); return; }
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          S.image = img; S.imageW = img.width; S.imageH = img.height;
-          uploadPreview.src = e.target.result;
-          uploadZone.classList.add('has-image');
-          S.imageReady = true;
-          $('generateBtn').disabled = false;
-          toast('图片已加载，点击生成 2.5D 效果');
-        };
-        img.src = e.target.result;
+    const parallaxFrag = `
+      uniform sampler2D map;
+      uniform sampler2D depthMap;
+      uniform float parallaxStrength;
+      uniform float depthBias;
+      uniform float depthContrast;
+      uniform vec3 lightDir;
+      varying vec2 vUv;
+      varying vec3 vViewDirTS;
+      void main() {
+        float depth = 1.0 - texture2D(depthMap, vUv).r;
+        depth = clamp(depth + depthBias, 0.0, 1.0);
+        depth = pow(depth, depthContrast);
+        depth = smoothstep(0.15, 0.85, depth);
+        float viewAngle = length(vViewDirTS.xy) / max(abs(vViewDirTS.z), 0.1);
+        viewAngle = min(viewAngle, 0.6);
+        vec2 offset = vViewDirTS.xy / max(vViewDirTS.z, 0.05) * depth * parallaxStrength;
+        offset = clamp(offset, vec2(-0.03), vec2(0.03));
+        vec2 uv = vUv - offset;
+        uv = clamp(uv, 0.001, 0.999);
+        vec4 color = texture2D(map, uv);
+        vec3 c = pow(color.rgb, vec3(1.0 / 2.2));
+        float diff = max(dot(vec3(0.0, 0.0, 1.0), lightDir), 0.0);
+        vec3 lit = vec3(0.95) + vec3(0.05) * diff;
+        gl_FragColor = vec4(c * lit, color.a);
+      }
+    `;
+
+    function processAIMatte(alphaRaw, mattingDims, imgData, w, h) {
+      const [modH, modW] = mattingDims || [Math.round(Math.sqrt(alphaRaw.length)), Math.round(Math.sqrt(alphaRaw.length))];
+      const alphaCanvas = document.createElement('canvas');
+      alphaCanvas.width = modW; alphaCanvas.height = modH;
+      const alphaCtx = alphaCanvas.getContext('2d');
+      const alphaImg = alphaCtx.createImageData(modW, modH);
+      for (let i = 0; i < alphaRaw.length; i++) {
+        const v = Math.max(0, Math.min(255, Math.round(alphaRaw[i] * 255)));
+        alphaImg.data[i * 4] = v;
+        alphaImg.data[i * 4 + 1] = v;
+        alphaImg.data[i * 4 + 2] = v;
+        alphaImg.data[i * 4 + 3] = 255;
+      }
+      alphaCtx.putImageData(alphaImg, 0, 0);
+      const alphaFull = document.createElement('canvas');
+      alphaFull.width = w; alphaFull.height = h;
+      const afCtx = alphaFull.getContext('2d');
+      afCtx.drawImage(alphaCanvas, 0, 0, w, h);
+      const alphaData = afCtx.getImageData(0, 0, w, h);
+
+      let whiteCount = 0, totalBorder = 0;
+      const sampleBorder = (x, y) => {
+        const idx = (y * w + x) * 4;
+        const r = imgData.data[idx], g = imgData.data[idx + 1], b = imgData.data[idx + 2];
+        totalBorder++;
+        const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+        if (maxC > 200 && (maxC - minC) < 25) whiteCount++;
       };
-      reader.readAsDataURL(file);
+      for (let x = 0; x < w; x += Math.max(1, Math.floor(w / 50))) {
+        sampleBorder(x, 0); sampleBorder(x, h - 1);
+      }
+      for (let y = 0; y < h; y += Math.max(1, Math.floor(h / 50))) {
+        sampleBorder(0, y); sampleBorder(w - 1, y);
+      }
+      const isWhiteStudio = (whiteCount / totalBorder) > 0.6;
+
+      const finalAlpha = new Float32Array(w * h);
+      for (let i = 0; i < w * h; i++) {
+        const pi = i * 4;
+        const modAlpha = alphaData.data[pi] / 255.0;
+        if (isWhiteStudio && modAlpha < 0.9) {
+          // Only color-key for areas where MODNet is uncertain (white bg leakage)
+          const r = imgData.data[pi], g = imgData.data[pi + 1], b = imgData.data[pi + 2];
+          const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+          const brightness = maxC / 255.0;
+          const saturation = maxC > 0 ? (maxC - minC) / maxC : 0;
+          let colorAlpha = 1.0;
+          if (brightness > 0.85 && saturation < 0.1) colorAlpha = 0.0;
+          else if (brightness > 0.75 && saturation < 0.15) colorAlpha = 1.0 - (brightness - 0.75) / 0.1 * (1 - saturation / 0.15);
+          finalAlpha[i] = Math.min(modAlpha, colorAlpha);
+        } else {
+          finalAlpha[i] = modAlpha;
+        }
+      }
+
+      let rSum = 0, gSum = 0, bSum = 0, count = 0;
+      for (let i = 0; i < finalAlpha.length; i++) {
+        if (finalAlpha[i] < 0.3) {
+          const pi = i * 4;
+          rSum += imgData.data[pi];
+          gSum += imgData.data[pi + 1];
+          bSum += imgData.data[pi + 2];
+          count++;
+        }
+      }
+      return {
+        finalAlpha,
+        avgR: count > 0 ? Math.round(rSum / count) : 240,
+        avgG: count > 0 ? Math.round(gSum / count) : 240,
+        avgB: count > 0 ? Math.round(bSum / count) : 240,
+      };
     }
 
-    // ===================== DEPTH =====================
-    async function runDepth() {
-      if (!S.image) return;
+    function buildForegroundCanvas(imgData, finalAlpha, w, h, skipErode) {
+      const fgCanvas = document.createElement('canvas');
+      fgCanvas.width = w; fgCanvas.height = h;
+      const fgCtx = fgCanvas.getContext('2d');
+      const fgPixels = fgCtx.createImageData(w, h);
 
-      // On mobile, pre-enable gyro while user gesture is active (iOS requires it)
-      if (isMobile) enableGyro();
+      for (let i = 0; i < finalAlpha.length; i++) {
+        const pi = i * 4;
+        const a = finalAlpha[i];
+        let fgAlpha = 0;
+        if (a > 0.9) fgAlpha = 255;
+        else if (a > 0.75) fgAlpha = 255 * (a - 0.75) / 0.15;
+        fgPixels.data[pi]     = imgData.data[pi];
+        fgPixels.data[pi + 1] = imgData.data[pi + 1];
+        fgPixels.data[pi + 2] = imgData.data[pi + 2];
+        fgPixels.data[pi + 3] = fgAlpha;
+      }
 
-      showLoading('正在生成深度图...', '使用 AI 模型分析图像深度');
-      $('depthStatus').style.display = 'flex';
+      for (let i = 0; i < finalAlpha.length; i++) {
+        const pi = i * 4;
+        const a = fgPixels.data[pi + 3];
+        if (a > 0 && a < 250) {
+          const cx = i % w, cy = Math.floor(i / w);
+          let rAcc = 0, gAcc = 0, bAcc = 0, cnt = 0;
+          for (let dy = -2; dy <= 2; dy++) {
+            for (let dx = -2; dx <= 2; dx++) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+              const ni = (ny * w + nx) * 4;
+              if (fgPixels.data[ni + 3] >= 250) {
+                const dist = Math.abs(dx) + Math.abs(dy);
+                const weight = dist === 0 ? 3 : (dist === 1 ? 2 : 1);
+                rAcc += fgPixels.data[ni] * weight;
+                gAcc += fgPixels.data[ni + 1] * weight;
+                bAcc += fgPixels.data[ni + 2] * weight;
+                cnt += weight;
+              }
+            }
+          }
+          if (cnt > 0) {
+            fgPixels.data[pi]     = Math.round(rAcc / cnt);
+            fgPixels.data[pi + 1] = Math.round(gAcc / cnt);
+            fgPixels.data[pi + 2] = Math.round(bAcc / cnt);
+          }
+        }
+      }
+
+      if (!skipErode) {
+        const erodedAlpha = new Uint8ClampedArray(finalAlpha.length);
+        for (let i = 0; i < finalAlpha.length; i++) {
+          const cx = i % w, cy = Math.floor(i / w);
+          let minNeighbor = 255;
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || nx >= w || ny < 0 || ny >= h) { minNeighbor = 0; break; }
+              const na = fgPixels.data[(ny * w + nx) * 4 + 3];
+              if (na < minNeighbor) minNeighbor = na;
+            }
+            if (minNeighbor === 0) break;
+          }
+          erodedAlpha[i] = minNeighbor;
+        }
+        for (let i = 0; i < finalAlpha.length; i++) {
+          fgPixels.data[i * 4 + 3] = erodedAlpha[i];
+        }
+      }
+
+      fgCtx.putImageData(fgPixels, 0, 0);
+      return fgCanvas;
+    }
+
+    // A real depth mesh gives the camera something physical to move around.
+    // The former effect only shifted texture coordinates, which reads as a flat
+    // card (and becomes noticeably warped near the edges).
+    function makeDepthGeometry(aspect, depthCanvas, layerDepth = 1) {
+      const longSide = 190;
+      const sx = Math.max(48, Math.round(aspect >= 1 ? longSide : longSide * aspect));
+      const sy = Math.max(48, Math.round(aspect >= 1 ? longSide / aspect : longSide));
+      const geometry = new THREE.PlaneGeometry(
+        aspect >= 1 ? 1 : aspect,
+        aspect >= 1 ? 1 / aspect : 1,
+        sx, sy
+      );
+      geometry.userData.depthLayer = layerDepth;
+      geometry.userData.depthCanvas = depthCanvas;
+      geometry.userData.sampleWidth = sx + 1;
+      geometry.userData.sampleHeight = sy + 1;
+      applyDepthToGeometry(geometry);
+      return geometry;
+    }
+
+    function applyDepthToGeometry(geometry) {
+      const source = geometry.userData.depthCanvas;
+      if (!source) return;
+      const pos = geometry.attributes.position;
+      const sample = geometry.userData._sampleCanvas || (() => {
+        const c = document.createElement('canvas');
+        c.width = geometry.userData.sampleWidth;
+        c.height = geometry.userData.sampleHeight;
+        geometry.userData._sampleCanvas = c;
+        return c;
+      })();
+      const sampleCtx = sample.getContext('2d', { willReadFrequently: true });
+      // Downsample the depth texture to the mesh resolution, so rebuilding stays
+      // responsive even for large uploaded photographs.
+      sampleCtx.drawImage(source, 0, 0, sample.width, sample.height);
+      const px = sampleCtx.getImageData(0, 0, sample.width, sample.height).data;
+      const values = new Float32Array(pos.count);
+      for (let i = 0; i < pos.count; i++) values[i] = 1 - px[i * 4] / 255;
+      // Suppress single-pixel AI depth noise before it turns into visible
+      // ripples on the 3D surface, while retaining edges and silhouettes.
+      const filtered = values.slice();
+      const cols = geometry.userData.sampleWidth;
+      const rows = geometry.userData.sampleHeight;
+      for (let y = 1; y < rows - 1; y++) {
+        for (let x = 1; x < cols - 1; x++) {
+          const i = y * cols + x;
+          filtered[i] = values[i] * 0.60 +
+            (values[i - 1] + values[i + 1] + values[i - cols] + values[i + cols]) * 0.10;
+        }
+      }
+      const sorted = Array.from(values).sort((a, b) => a - b);
+      const low = sorted[Math.floor(sorted.length * 0.04)];
+      const high = sorted[Math.floor(sorted.length * 0.96)];
+      const range = Math.max(high - low, 0.08);
+      const amount = (0.035 + S.depthScale * 0.14) * geometry.userData.depthLayer;
+      for (let i = 0; i < pos.count; i++) {
+        const depth = Math.min(1, Math.max(0, (filtered[i] - low) / range));
+        // A gentle curve keeps large skies/walls stable while bringing subjects forward.
+        const tunedDepth = Math.min(1, Math.max(0, depth + S.depthBias * 0.20));
+        pos.setZ(i, (Math.pow(tunedDepth, S.depthContrast) - 0.45) * amount);
+      }
+      pos.needsUpdate = true;
+      geometry.computeVertexNormals();
+      geometry.attributes.normal.needsUpdate = true;
+    }
+
+    function makeLayerMaterial(texture, transparent = false) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.needsUpdate = true;
+      // Depth maps have sharp discontinuities at hair and clothing edges. An
+      // illuminated physical material turns those folds into a dark outline;
+      // an unlit texture keeps the photograph's original lighting intact.
+      return new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent,
+        alphaTest: transparent ? 0.015 : 0,
+        side: THREE.FrontSide,
+        depthWrite: !transparent,
+      });
+    }
+
+    // Studio portraits often contain a real wall shadow that a depth effect
+    // faithfully preserves.  Remove only neutral, darker background pixels in a
+    // narrow band around the depth-defined subject; clothing and coloured scene
+    // details are left untouched.
+    function softenCastShadow(imageCanvas, depthCanvas) {
+      if (!S.shadowCleanup) return imageCanvas;
+      const w = imageCanvas.width, h = imageCanvas.height;
+      const ctx = imageCanvas.getContext('2d', { willReadFrequently: true });
+      const source = ctx.getImageData(0, 0, w, h);
+      const depthProbe = document.createElement('canvas');
+      depthProbe.width = w; depthProbe.height = h;
+      const dpCtx = depthProbe.getContext('2d', { willReadFrequently: true });
+      dpCtx.drawImage(depthCanvas, 0, 0, w, h);
+      const depth = dpCtx.getImageData(0, 0, w, h).data;
+      const distance = new Uint16Array(w * h);
+      distance.fill(255);
+      for (let i = 0; i < distance.length; i++) {
+        if (depth[i * 4] > 150) distance[i] = 0;
+      }
+      // Two-pass distance transform: enough reach to cover ordinary soft wall shadows.
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const i = y * w + x;
+        if (x) distance[i] = Math.min(distance[i], distance[i - 1] + 1);
+        if (y) distance[i] = Math.min(distance[i], distance[i - w] + 1);
+      }
+      for (let y = h - 1; y >= 0; y--) for (let x = w - 1; x >= 0; x--) {
+        const i = y * w + x;
+        if (x + 1 < w) distance[i] = Math.min(distance[i], distance[i + 1] + 1);
+        if (y + 1 < h) distance[i] = Math.min(distance[i], distance[i + w] + 1);
+      }
+      // Corner samples are a robust estimate of an uncluttered studio wall.
+      let br = 0, bg = 0, bb = 0, n = 0;
+      const corner = Math.max(12, Math.round(Math.min(w, h) * 0.08));
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        if (!((x < corner || x >= w - corner) && (y < corner || y >= h - corner))) continue;
+        const p = (y * w + x) * 4;
+        br += source.data[p]; bg += source.data[p + 1]; bb += source.data[p + 2]; n++;
+      }
+      br /= n; bg /= n; bb /= n;
+      const wallLight = (br + bg + bb) / 3;
+      for (let i = 0; i < distance.length; i++) {
+        if (distance[i] === 0 || distance[i] > 54 || depth[i * 4] > 120) continue;
+        const p = i * 4;
+        const r = source.data[p], g = source.data[p + 1], b = source.data[p + 2];
+        const high = Math.max(r, g, b), low = Math.min(r, g, b);
+        const light = (r + g + b) / 3;
+        // Neutral darkening near the mask is a cast shadow. Preserve colourful
+        // pixels and very dark pixels, which are more likely to be real objects.
+        if (high - low > 32 || light < 42 || light > wallLight - 14) continue;
+        const near = 1 - distance[i] / 54;
+        const darkness = Math.min(1, (wallLight - light) / Math.max(wallLight, 1));
+        const mix = Math.min(0.78, near * darkness * 1.35);
+        source.data[p] = Math.round(r * (1 - mix) + br * mix);
+        source.data[p + 1] = Math.round(g * (1 - mix) + bg * mix);
+        source.data[p + 2] = Math.round(b * (1 - mix) + bb * mix);
+      }
+      const cleaned = document.createElement('canvas');
+      cleaned.width = w; cleaned.height = h;
+      cleaned.getContext('2d').putImageData(source, 0, 0);
+      return cleaned;
+    }
+
+    function buildPlane(img, depthCv) {
+      if (planeBack) { scene.remove(planeBack); planeBack.geometry.dispose(); planeBack.material.dispose(); planeBack = null; }
+      if (planeFront) { scene.remove(planeFront); planeFront.geometry.dispose(); planeFront.material.dispose(); planeFront = null; }
+
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+      const asp = w / h;
+
+      const imgTemp = (S.imageCanvas && S.imageCanvas.width === w && S.imageCanvas.height === h)
+        ? S.imageCanvas
+        : (() => {
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            S.imageCanvas = c;
+            return c;
+          })();
+      const ictx = imgTemp.getContext('2d');
+      const imgData = ictx.getImageData(0, 0, w, h);
+
+      // --- AI-Enhanced Depth Map ---
+      let finalDepthCv = depthCv;
+      // Apply semantic segmentation depth modulation
+      if (S.segmentationData) {
+        finalDepthCv = buildSemanticDepthMap(depthCv, w, h);
+      }
+      // Apply face depth enhancement
+      if (S.faceLandmarks) {
+        finalDepthCv = enhanceDepthWithFace(finalDepthCv, w, h, S.faceLandmarks);
+      }
+
+      const depthTemp = document.createElement('canvas');
+      depthTemp.width = w; depthTemp.height = h;
+      const dctx = depthTemp.getContext('2d');
+      dctx.drawImage(finalDepthCv, 0, 0, w, h);
+      const cleanImage = softenCastShadow(imgTemp, depthTemp);
+
+      // Background: AI-segmented fill (use MODNet to clean background area)
+      // Foreground: subject with alpha via AI matting or depth fallback
+      const alphaRaw = S.mattingModel;
+      let bgCanvas, fgCanvas;
+      if (!!alphaRaw && alphaRaw.length > 0) {
+        const { finalAlpha, avgR, avgG, avgB } = processAIMatte(alphaRaw, S.mattingDims, imgData, w, h);
+
+        // --- LaMa Inpainted Background ---
+        if (S.inpaintedBg) {
+          bgCanvas = document.createElement('canvas');
+          bgCanvas.width = w; bgCanvas.height = h;
+          const bgCtx = bgCanvas.getContext('2d');
+          // Draw LaMa-inpainted result as base
+          bgCtx.drawImage(S.inpaintedBg, 0, 0, w, h);
+          // Blend original image back for background areas (where alpha is low)
+          const inpData = bgCtx.getImageData(0, 0, w, h);
+          for (let i = 0; i < finalAlpha.length; i++) {
+            const pi = i * 4;
+            const a = finalAlpha[i];
+            // Foreground areas: keep LaMa inpainted result
+            // Background areas: blend towards original (LaMa might have altered them)
+            if (a < 0.3) {
+              // Background: use original image
+              inpData.data[pi]     = imgData.data[pi];
+              inpData.data[pi + 1] = imgData.data[pi + 1];
+              inpData.data[pi + 2] = imgData.data[pi + 2];
+            } else if (a < 0.75) {
+              // Edge: blend
+              const t = (a - 0.3) / 0.45;
+              inpData.data[pi]     = Math.round(imgData.data[pi] * (1 - t) + inpData.data[pi] * t);
+              inpData.data[pi + 1] = Math.round(imgData.data[pi + 1] * (1 - t) + inpData.data[pi + 1] * t);
+              inpData.data[pi + 2] = Math.round(imgData.data[pi + 2] * (1 - t) + inpData.data[pi + 2] * t);
+            }
+            inpData.data[pi + 3] = 255;
+          }
+          bgCtx.putImageData(inpData, 0, 0);
+          // Soft blur on inpainted area only
+          bgCtx.filter = 'blur(2px)';
+          bgCtx.drawImage(bgCanvas, 0, 0);
+          bgCtx.filter = 'none';
+        } else {
+          // Fallback: average color fill (original behavior)
+          bgCanvas = document.createElement('canvas');
+          bgCanvas.width = w; bgCanvas.height = h;
+          const bgCtx = bgCanvas.getContext('2d');
+          bgCtx.drawImage(img, 0, 0, w, h);
+          const bgPixels = bgCtx.getImageData(0, 0, w, h);
+          for (let i = 0; i < finalAlpha.length; i++) {
+            const pi = i * 4;
+            const a = finalAlpha[i];
+            let fillA = 0;
+            if (a > 0.9) fillA = 1.0;
+            else if (a > 0.75) fillA = (a - 0.75) / 0.15;
+            fillA = Math.min(1, fillA * 1.5);
+            bgPixels.data[pi]     = Math.round(imgData.data[pi] * (1 - fillA) + avgR * fillA);
+            bgPixels.data[pi + 1] = Math.round(imgData.data[pi + 1] * (1 - fillA) + avgG * fillA);
+            bgPixels.data[pi + 2] = Math.round(imgData.data[pi + 2] * (1 - fillA) + avgB * fillA);
+            bgPixels.data[pi + 3] = 255;
+          }
+          bgCtx.putImageData(bgPixels, 0, 0);
+          bgCtx.filter = 'blur(3px)';
+          bgCtx.drawImage(bgCanvas, 0, 0);
+        }
+        fgCanvas = buildForegroundCanvas(imgData, finalAlpha, w, h);
+      } else {
+        // Never invent a hard foreground mask from a depth threshold: it cuts
+        // through buildings, hair and product edges. Until matting is ready,
+        // keep a complete high-detail depth mesh as the visible layer.
+        fgCanvas = imgTemp;
+      }
+      // A flat average-colour fill behind a cut-out is what creates the common
+      // grey "drop shadow" around people when the view moves.  Only use a
+      // separately reconstructed background when one actually exists; otherwise
+      // keep the original pixels aligned behind the subject.
+      if (alphaRaw && !S.inpaintedBg) bgCanvas = imgTemp;
+      if (!bgCanvas) {
+        bgCanvas = document.createElement('canvas');
+        bgCanvas.width = w; bgCanvas.height = h;
+        bgCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      }
+
+      // Without a genuinely reconstructed background, two separate planes show
+      // the same person twice at different depths. That reads as a grey shadow.
+      // Use one continuous depth surface by default; enable layered occlusion
+      // only when an AI inpainted background is actually available.
+      const useSeparatedLayers = Boolean(alphaRaw && S.inpaintedBg);
+      if (!useSeparatedLayers) {
+        const texture = new THREE.CanvasTexture(cleanImage);
+        planeBack = new THREE.Mesh(makeDepthGeometry(asp, depthTemp, 1), makeLayerMaterial(texture));
+        planeBack.position.z = 0;
+        scene.add(planeBack);
+      } else {
+        const texBack = new THREE.CanvasTexture(bgCanvas);
+        const matBack = makeLayerMaterial(texBack);
+        planeBack = new THREE.Mesh(makeDepthGeometry(asp, depthTemp, 0.42), matBack);
+        planeBack.position.z = 0;
+        scene.add(planeBack);
+
+        const texFront = new THREE.CanvasTexture(fgCanvas);
+        const matFront = makeLayerMaterial(texFront, true);
+        planeFront = new THREE.Mesh(makeDepthGeometry(asp, depthTemp, 1.15), matFront);
+        planeFront.position.z = 0.012;
+        scene.add(planeFront);
+      }
+    }
+
+    function tick(scheduled = false) {
+      if (!scheduled && tickRunning) return;
+      tickRunning = true;
+      requestAnimationFrame(() => tick(true));
+      if (!planeBack) return;
+
+      // Deadzone filter: ignore tiny target changes to prevent jelly
+      const dx = S.targetX - S.currX;
+      const dy = S.targetY - S.currY;
+      if (Math.abs(dx) < DEADZONE && Math.abs(dy) < DEADZONE) {
+        S.currX = S.targetX;
+        S.currY = S.targetY;
+      } else {
+        const k = 1 - S.damping;
+        S.currX += dx * k;
+        S.currY += dy * k;
+      }
+
+      camera.position.x = S.currX;
+      camera.position.y = S.currY;
+      camera.position.z = 2;
+      camera.lookAt(0, 0, 0);
+
+      // Cosmic particles: slow ethereal drift + star twinkling
+      // Skip heavy per-particle update when camera is idle to save CPU
+      S.tickFrame++;
+      const isIdle = S.targetX === 0 && S.targetY === 0 && S.currX === 0 && S.currY === 0;
+      if (particles && particleData && (!isIdle || S.tickFrame % 3 === 0)) {
+        const pos = particles.geometry.attributes.position.array;
+        const siz = particles.geometry.attributes.size.array;
+        const time = performance.now() * 0.001;
+
+        for (let i = 0; i < particleData.length; i++) {
+          const pd = particleData[i];
+          const i3 = i * 3;
+
+          // Slow, ethereal multi-axis orbit
+          const ox = Math.sin(time * pd.freqX + pd.phaseX) * pd.orbitRx;
+          const oy = Math.cos(time * pd.freqY + pd.phaseY) * pd.orbitRy;
+          const oz = Math.sin(time * pd.freqZ + pd.phaseZ) * pd.orbitRz;
+
+          pos[i3]     = pd.baseX + ox;
+          pos[i3 + 1] = pd.baseY + oy + time * pd.driftY;
+          pos[i3 + 2] = pd.baseZ + oz;
+
+          // Size pulsing: stars twinkle more dramatically
+          if (pd.type === 'dust') {
+            // Dust: barely perceptible pulse
+            siz[i] = pd.baseSize * (0.85 + 0.15 * Math.sin(time * pd.pulseFreq + pd.pulsePhase));
+          } else if (pd.type === 'star') {
+            // Stars: dramatic twinkle with irregular feel (sum of two sines)
+            const twinkle = pd.twinkleStrength || 0.4;
+            const pulse1 = Math.sin(time * pd.pulseFreq + pd.pulsePhase);
+            const pulse2 = Math.sin(time * pd.pulseFreq * 1.7 + pd.pulsePhase + 1.3) * 0.5;
+            const combined = pulse1 + pulse2;
+            siz[i] = pd.baseSize * (1.0 - twinkle + twinkle * Math.max(0.1, (combined + 1.5) / 2.5));
+          } else {
+            // Flares: slow, majestic pulse
+            const twinkle = pd.twinkleStrength || 0.5;
+            siz[i] = pd.baseSize * (1.0 - twinkle * 0.5 + twinkle * 0.5 * Math.sin(time * pd.pulseFreq + pd.pulsePhase));
+          }
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+        particles.geometry.attributes.size.needsUpdate = true;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // ===================== MOBILE GYROSCOPE =====================
+    const isMobileViewport = () => window.matchMedia('(max-width: 600px), (pointer: coarse)').matches;
+    function onDeviceTilt(event) {
+      if (!S.gyroActive || !S.depthReady) return;
+      const gamma = Number.isFinite(event.gamma) ? event.gamma : 0; // left / right
+      const beta = Number.isFinite(event.beta) ? event.beta : 0;    // front / back
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      // Small, capped motion avoids exposing the edges of a single photo.
+      S.targetX = clamp(gamma / 42, -1, 1) * S.sensitivity * 0.18;
+      S.targetY = clamp((beta - 45) / 42, -1, 1) * S.sensitivity * -0.18;
+    }
+
+    function enableGyroscope() {
+      if (S.gyroActive) return;
+      S.mode = 'gyro';
+      S.gyroActive = true;
+      window.addEventListener('deviceorientation', onDeviceTilt, { passive: true });
+      toast('已启用陀螺仪控制，倾斜手机可查看 3D 效果');
+    }
+
+    function setupMobileGyroscope() {
+      if (!isMobileViewport()) return;
+      // Most mobile browsers expose orientation immediately. iOS requires the
+      // permission request to be tied to a user gesture, so use the first tap.
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const requestGyro = async () => {
+          try {
+            if (await DeviceOrientationEvent.requestPermission() === 'granted') enableGyroscope();
+            else toast('未获得陀螺仪权限，无法使用手机倾斜控制');
+          } catch (_) { toast('陀螺仪权限请求失败'); }
+        };
+        window.addEventListener('pointerdown', requestGyro, { once: true, passive: true });
+        toast('轻触页面以启用陀螺仪控制');
+      } else if ('DeviceOrientationEvent' in window) {
+        enableGyroscope();
+      }
+    }
+
+    // ===================== MOUSE MODE =====================
+    canvasArea.addEventListener('mousemove', (e) => {
+      if (S.mode !== 'mouse' || !S.depthReady) return;
+      const rect = canvasArea.getBoundingClientRect();
+      // 3D Touch: cursor position relative to center → tilt
+      const cx = (e.clientX - rect.left) / rect.width;
+      const cy = (e.clientY - rect.top) / rect.height;
+      // Keep the move in the range a single photo can plausibly reveal;
+      // larger orbiting exposes texture edges instead of adding realism.
+      S.targetX = (cx - 0.5) * 2 * S.sensitivity * 0.22;
+      S.targetY = -(cy - 0.5) * 2 * S.sensitivity * 0.22;
+      S.isGrabbing = true;
+    });
+    canvasArea.addEventListener('mouseleave', () => {
+      if (S.mode === 'mouse') { S.targetX = 0; S.targetY = 0; S.isGrabbing = false; }
+    });
+
+    // ===================== FILE UPLOAD =====================
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault(); uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length) loadFile(e.target.files[0]); });
+
+    function loadFile(file) {
+      if (!file.type.startsWith('image/')) { toast('请选择图片文件'); return; }
+      // Clean up previous scene state
+      if (S.imageUrl) URL.revokeObjectURL(S.imageUrl);
+      if (planeBack) { scene.remove(planeBack); planeBack.geometry.dispose(); planeBack.material.dispose(); planeBack = null; }
+      if (planeFront) { scene.remove(planeFront); planeFront.geometry.dispose(); planeFront.material.dispose(); planeFront = null; }
+      if (particles) { scene.remove(particles); particles.geometry.dispose(); particles.material.dispose(); particles = null; }
+      S.depthReady = false;
+      S.mattingModel = null;
+      S.mattingDims = null;
+      S.inpaintedBg = null;
+      S.segmentationData = null;
+      S.segmentationDims = null;
+      S.faceLandmarks = null;
+      S.inpaintReady = false;
+      S.segmentReady = false;
+      S.faceReady = false;
+      $('aiStatus').style.display = 'none';
+      setAIStatus('Inpaint', '');
+      setAIStatus('Segment', '');
+      setAIStatus('Face', '');
+      $('depthPreview').classList.remove('visible');
+      $('depthStatus').style.display = 'none';
       $('depthStatus').classList.remove('done');
-      $('depthStatusText').textContent = '正在生成深度图...';
-      $('hudDepth').classList.replace('off', 'on');
+      $('hudDepth').classList.replace('on', 'off');
+      threeCanvas.style.display = 'none';
+      $('welcomeScreen').style.display = 'block';
+      $('hud').style.display = 'none';
+      const url = URL.createObjectURL(file);
+      S.imageUrl = url;
+      const img = new Image();
+      img.onload = () => {
+        uploadPreview.src = url;
+        uploadZone.classList.add('has-image');
+        $('generateBtn').disabled = false;
+        toast('图片加载成功，点击 "生成 2.5D 效果" 开始');
+      };
+      img.src = url;
+    }
 
-      const w = S.imageW, h = S.imageH;
-      S.imageCanvas = S.imageCanvas || document.createElement('canvas');
-      S.imageCanvas.width = w; S.imageCanvas.height = h;
-      const ictx = S.imageCanvas.getContext('2d');
-      ictx.drawImage(S.image, 0, 0, w, h);
+    // ===================== DEPTH ESTIMATION =====================
+    let depthPipeline = null;
 
+    async function loadModel() {
+      showLoad('正在加载深度估计模型...', '首次加载需要下载模型文件（约50MB），请耐心等待');
       try {
-        const depthData = await estimateDepth(S.imageCanvas);
-        S.depthMap = depthData;
-        S.depthW = depthData.width;
-        S.depthH = depthData.height;
-        S.depthReady = true;
+        const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        env.allowLocalModels = false;
+        depthPipeline = await pipeline('depth-estimation', 'Xenova/depth-anything-small-hf', {
+          progress_callback: (p) => {
+            if (p.status === 'progress') {
+              $('loadingText').textContent = `正在下载模型... ${Math.round(p.progress || 0)}%`;
+            }
+          }
+        });
+        S.modelLoaded = true;
+        hideLoad();
+        toast('深度估计模型加载完成');
+        return true;
+      } catch (err) {
+        console.error(err);
+        hideLoad();
+        toast('模型加载失败: ' + err.message);
+        return false;
+      }
+    }
 
-        $('depthStatus').classList.add('done');
+    async function runDepth() {
+      if (!S.imageReady) return;
+      if (!S.modelLoaded) { if (!await loadModel()) return; }
+      showLoad('正在生成深度图...', '');
+      try {
+        const { RawImage } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+
+        // Load image via img element, then draw to canvas for reliable input
+        const img = new Image();
+        img.src = S.imageUrl;
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+
+        const c = document.createElement('canvas');
+        const ctx = c.getContext('2d');
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > 1024 || h > 1024) {
+          const s = 1024 / Math.max(w, h);
+          w = Math.round(w * s); h = Math.round(h * s);
+        }
+        c.width = w; c.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+
+        // Convert canvas to RawImage
+        const image = RawImage.fromCanvas(c);
+        const result = await depthPipeline(image);
+        const dc = result.depth.toCanvas();
+        S.depthCanvas = dc;
+        if (S.autoParams) applyAutoParams();
+
+        // Show depth preview
+        const pcv = $('depthCanvas');
+        const pc = pcv.getContext('2d');
+        pcv.width = dc.width; pcv.height = dc.height;
+        pc.drawImage(dc, 0, 0);
+        $('depthPreview').classList.add('visible');
+        const st = $('depthStatus');
+        st.style.display = 'flex';
+        st.classList.add('done');
         $('depthStatusText').textContent = '深度图生成完成';
         $('hudDepth').classList.replace('off', 'on');
 
-        const dc = $('depthCanvas');
-        dc.width = depthData.width; dc.height = depthData.height;
-        const dctx = dc.getContext('2d');
-        const imgData = dctx.createImageData(depthData.width, depthData.height);
-        for (let i = 0; i < depthData.data.length; i++) {
-          const v = depthData.data[i];
-          imgData.data[i * 4] = v;
-          imgData.data[i * 4 + 1] = v;
-          imgData.data[i * 4 + 2] = v;
-          imgData.data[i * 4 + 3] = 255;
-        }
-        dctx.putImageData(imgData, 0, 0);
-        $('depthPreview').classList.add('visible');
-
-        hideLoading();
-        await initThreeScene();
+        hideLoad();
+        // Render as soon as the essential depth model finishes.  Secondary AI
+        // models enhance the image in the background and never block the result.
+        showScene();
+        S.depthReady = true;
+        toast('2.5D 效果生成完成！试试手势或鼠标控制视角');
+        if (S.aiEnhanced) enhanceSceneAI(image, w, h);
+        return;
       } catch (err) {
         console.error(err);
-        hideLoading();
-        $('depthStatusText').textContent = '深度图生成失败';
+        hideLoad();
         toast('深度图生成失败: ' + err.message);
       }
     }
 
-    async function estimateDepth(canvas) {
-      // Try API first
-      try {
-        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
-        const fd = new FormData();
-        fd.append('image', blob, 'img.jpg');
-
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 8000);
-        const resp = await fetch('https://depth-api.deno.dev/depth', {
-          method: 'POST',
-          body: fd,
-          signal: ctrl.signal
-        });
-        clearTimeout(timer);
-
-        if (resp.ok) {
-          const data = await resp.json();
-          return {
-            width: data.width || canvas.width,
-            height: data.height || canvas.height,
-            data: new Uint8Array(data.depth || data.data)
-          };
-        }
-      } catch (e) {
-        console.warn('Depth API failed, using local fallback:', e.message);
-      }
-
-      // Local fallback: luminance-based depth estimation
-      return localDepthEstimate(canvas);
-    }
-
-    function localDepthEstimate(canvas) {
-      const ctx = canvas.getContext('2d');
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const { data, width, height } = imgData;
-
-      // Downscale for performance: target ~256px max dimension
-      const maxDim = 256;
-      const scale = Math.min(1, maxDim / Math.max(width, height));
-      const dw = Math.round(width * scale);
-      const dh = Math.round(height * scale);
-
-      const depth = new Uint8Array(dw * dh);
-
-      for (let y = 0; y < dh; y++) {
-        const srcY = Math.round(y / scale);
-        for (let x = 0; x < dw; x++) {
-          const srcX = Math.round(x / scale);
-          const idx = (srcY * width + srcX) * 4;
-          // Luminance: weighted RGB
-          const lum = data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114;
-          // Center-weighted: edges darker (farther), center brighter (closer)
-          const cx = (x / dw - 0.5) * 2;
-          const cy = (y / dh - 0.5) * 2;
-          const centerWeight = 1 - Math.sqrt(cx * cx + cy * cy) * 0.35;
-          const v = Math.max(0, Math.min(255, lum * centerWeight + 30));
-          depth[y * dw + x] = Math.round(v);
-        }
-      }
-
-      return { width: dw, height: dh, data: depth };
-    }
-
-    // ===================== THREE.JS =====================
-    async function initThreeScene() {
-      if (renderAF) { cancelAnimationFrame(renderAF); renderAF = null; }
-
-      const w = S.imageW, h = S.imageH;
-      const aspect = w / h;
-
-      if (!scene) {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 10);
-        camera.position.z = 1.5;
-        renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      }
-
-      const containerW = $('canvasArea').clientWidth;
-      const containerH = $('canvasArea').clientHeight;
-      const renderW = Math.min(containerW, containerH * aspect);
-      const renderH = renderW / aspect;
-      renderer.setSize(renderW, renderH, false);
-
-      if (planeBack) { scene.remove(planeBack); planeBack.geometry.dispose(); planeBack.material.dispose(); }
-      if (planeFront) { scene.remove(planeFront); planeFront.geometry.dispose(); planeFront.material.dispose(); }
-
-      const tex = new THREE.CanvasTexture(S.imageCanvas);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.minFilter = THREE.LinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-
-      const geom = new THREE.PlaneGeometry(1, 1 / aspect, 120, 120);
-      const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
-
-      planeBack = new THREE.Mesh(geom, mat);
-      planeBack.position.z = -0.002;
-      scene.add(planeBack);
-
-      const geom2 = new THREE.PlaneGeometry(1, 1 / aspect, 120, 120);
-      applyDepthToGeometry(geom2);
-      planeFront = new THREE.Mesh(geom2, mat);
-      planeFront.position.z = 0.002;
-      scene.add(planeFront);
-
-      if (!particleSystem) {
-        const pGeom = new THREE.BufferGeometry();
-        const count = 600;
-        const pos = new Float32Array(count * 3);
-        for (let i = 0; i < count; i++) {
-          pos[i * 3] = (Math.random() - 0.5) * 2;
-          pos[i * 3 + 1] = (Math.random() - 0.5) * 2 / aspect;
-          pos[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
-        }
-        pGeom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        const pMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.003, transparent: true, opacity: 0.4 });
-        particleSystem = new THREE.Points(pGeom, pMat);
-        scene.add(particleSystem);
-      }
-
+    function showScene() {
       $('welcomeScreen').style.display = 'none';
       threeCanvas.style.display = 'block';
       $('hud').style.display = 'flex';
+      resize();
+      buildPlane(uploadPreview, S.depthCanvas);
+      tick();
+    }
 
-      if (isMobile) {
-        $('sidebar').classList.add('mobile-hidden');
-        $('canvasArea').classList.add('mobile-full');
-        $('mobileBar').classList.add('visible');
-        enableGyro();
-      }
-
-      threeCanvas.style.width = renderW + 'px';
-      threeCanvas.style.height = renderH + 'px';
-
-      let lastRender = 0;
-      function render(ts) {
-        renderAF = requestAnimationFrame(render);
-        const dt = Math.min((ts - lastRender) / 1000, 0.1);
-        lastRender = ts;
-
-        S.currentX += (S.targetX - S.currentX) * (1 - S.damping) * 0.3;
-        S.currentY += (S.targetY - S.currentY) * (1 - S.damping) * 0.3;
-
-        if (planeFront) {
-          planeFront.rotation.y = S.currentX * 0.5;
-          planeFront.rotation.x = S.currentY * 0.5;
+    // Optional AI is deliberately progressive: the finished depth render stays
+    // interactive while subject matting and scene understanding are prepared.
+    let modnetModel = null, modnetProc = null;
+    async function enhanceSceneAI(image, w, h) {
+      const expectedUrl = S.imageUrl;
+      $('aiStatus').style.display = 'flex';
+      try {
+        setAIStatus('Segment', 'loading');
+        const t = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        const { AutoModel, AutoProcessor } = t;
+        if (!modnetModel) {
+          [modnetModel, modnetProc] = await Promise.all([
+            AutoModel.from_pretrained('Xenova/modnet', { device: 'wasm', dtype: 'q8' }),
+            AutoProcessor.from_pretrained('Xenova/modnet'),
+          ]);
         }
-        if (planeBack) {
-          planeBack.rotation.y = S.currentX * 0.3;
-          planeBack.rotation.x = S.currentY * 0.3;
+        const { pixel_values } = await modnetProc(image);
+        const { output } = await modnetModel({ input: pixel_values });
+        if (S.imageUrl !== expectedUrl) return;
+        const alphaTensor = output[0].squeeze_(0).squeeze_(0);
+        S.mattingModel = alphaTensor.data;
+        S.mattingDims = [alphaTensor.dims[0], alphaTensor.dims[1]];
+        setAIStatus('Segment', 'ready');
+
+        // Scene labels and facial detail improve the depth map when available,
+        // but a failure in either remains non-fatal.
+        const imageCanvas = document.createElement('canvas');
+        imageCanvas.width = w; imageCanvas.height = h;
+        imageCanvas.getContext('2d').drawImage(uploadPreview, 0, 0, w, h);
+        S.imageCanvas = imageCanvas;
+        const [segResult, faceResult] = await Promise.allSettled([
+          runSegFormer(imageCanvas), runFaceMesh(imageCanvas)
+        ]);
+        if (S.imageUrl !== expectedUrl) return;
+        if ((segResult.status === 'fulfilled' && segResult.value) ||
+            (faceResult.status === 'fulfilled' && faceResult.value)) {
+          if (S.autoParams && S.segmentationData) applyAutoParams();
+          buildPlane(uploadPreview, S.depthCanvas);
+          toast('AI 深度细节已优化');
         }
-
-        if (particleSystem && (Math.abs(S.currentX) > 0.001 || Math.abs(S.currentY) > 0.001)) {
-          particleSystem.rotation.y = S.currentX * 0.7;
-          particleSystem.rotation.x = S.currentY * 0.7;
-        }
-
-        renderer.render(scene, camera);
+      } catch (err) {
+        console.warn('Optional AI enhancement skipped:', err);
+        setAIStatus('Segment', '');
       }
-      renderAF = requestAnimationFrame(render);
-
-      toast('2.5D 效果生成完成！');
     }
-
-    function applyDepthToGeometry(geom) {
-      if (!S.depthReady || !S.depthMap) return;
-      const dw = S.depthW, dh = S.depthH;
-      const scale = S.depthScale, bias = S.depthBias, contrast = S.depthContrast;
-
-      const sampleCv = document.createElement('canvas');
-      sampleCv.width = dw; sampleCv.height = dh;
-      const sctx = sampleCv.getContext('2d');
-      const imgData = sctx.createImageData(dw, dh);
-      const raw = S.depthMap.data;
-      for (let i = 0; i < raw.length; i++) {
-        let v = raw[i] / 255;
-        v = (v - 0.5) * contrast + 0.5;
-        v = Math.max(0, Math.min(1, v));
-        imgData.data[i * 4] = v * 255;
-        imgData.data[i * 4 + 1] = v * 255;
-        imgData.data[i * 4 + 2] = v * 255;
-        imgData.data[i * 4 + 3] = 255;
-      }
-      sctx.putImageData(imgData, 0, 0);
-
-      const pos = geom.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const y = pos.getY(i);
-        const u = (x + 0.5) * (dw - 1);
-        const v = (1 - (y + 0.5)) * (dh - 1);
-        const sx = Math.floor(u);
-        const sy = Math.floor(v);
-        if (sx >= 0 && sx < dw && sy >= 0 && sy < dh) {
-          const d = raw[sy * dw + sx] / 255;
-          pos.setZ(i, (d * scale + bias) * 0.15);
-        }
-      }
-      pos.needsUpdate = true;
-      geom.computeVertexNormals();
-    }
-
-    // ===================== MOUSE / TOUCH =====================
-    $('canvasArea').addEventListener('mousemove', e => {
-      if (S.mode !== 'mouse' || S.isGrabbing || S.useGyro) return;
-      const rect = threeCanvas.getBoundingClientRect();
-      const cx = (e.clientX - rect.left) / rect.width - 0.5;
-      const cy = (e.clientY - rect.top) / rect.height - 0.5;
-      S.targetX = cx * 2 * S.sensitivity;
-      S.targetY = -cy * 2 * S.sensitivity;
-    });
-    $('canvasArea').addEventListener('mouseleave', () => {
-      if (S.mode === 'mouse' && !S.isGrabbing) { S.targetX = 0; S.targetY = 0; }
-    });
-
-    // Touch for mobile
-    $('canvasArea').addEventListener('touchmove', e => {
-      if (S.useGyro || !S.depthReady) return;
-      const touch = e.touches[0];
-      const rect = threeCanvas.getBoundingClientRect();
-      const cx = (touch.clientX - rect.left) / rect.width - 0.5;
-      const cy = (touch.clientY - rect.top) / rect.height - 0.5;
-      S.targetX = cx * 2 * S.sensitivity;
-      S.targetY = -cy * 2 * S.sensitivity;
-    }, { passive: true });
-    $('canvasArea').addEventListener('touchend', () => {
-      if (!S.useGyro && !S.isGrabbing) { S.targetX = 0; S.targetY = 0; }
-    });
-
-    // ===================== GYROSCOPE =====================
-    let gyroEnabled = false;
-
-    function handleOrientation(e) {
-      if (!gyroEnabled || !S.depthReady) return;
-      let beta = e.beta;
-      let gamma = e.gamma;
-      if (S.gyroBeta0 === null) { S.gyroBeta0 = beta; S.gyroGamma0 = gamma; }
-      const dy = (beta - S.gyroBeta0) / 45;
-      const dx = (gamma - S.gyroGamma0) / 45;
-      S.targetX = Math.max(-1, Math.min(1, dx * S.sensitivity));
-      S.targetY = Math.max(-1, Math.min(1, -dy * S.sensitivity));
-    }
-
-    async function enableGyro() {
-      if (gyroEnabled) return;
-      if (typeof DeviceOrientationEvent === 'undefined') {
-        toast('设备不支持陀螺仪'); return;
-      }
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const perm = await DeviceOrientationEvent.requestPermission();
-          if (perm !== 'granted') { toast('陀螺仪权限被拒绝'); return; }
-        } catch (e) { toast('陀螺仪权限请求失败'); return; }
-      }
-      gyroEnabled = true;
-      S.useGyro = true;
-      S.gyroBeta0 = null;
-      S.gyroGamma0 = null;
-      window.addEventListener('deviceorientation', handleOrientation);
-      $('mbGyro').classList.add('gyro-active');
-      $('mbTouch').classList.remove('active');
-      toast('陀螺仪已启用，倾斜手机控制视角');
-    }
-
-    function disableGyro() {
-      gyroEnabled = false;
-      S.useGyro = false;
-      S.targetX = 0; S.targetY = 0;
-      window.removeEventListener('deviceorientation', handleOrientation);
-      $('mbGyro').classList.remove('gyro-active');
-      $('mbTouch').classList.add('active');
-    }
-
-    // Mobile bar buttons
-    $('mbGyro').addEventListener('click', () => {
-      if (gyroEnabled) { disableGyro(); }
-      else { enableGyro(); }
-    });
-    $('mbTouch').addEventListener('click', () => {
-      disableGyro();
-      toast('触摸模式，手指滑动控制视角');
-    });
-    $('mbParams').addEventListener('click', () => {
-      const sidebar = $('sidebar');
-      if (sidebar.classList.contains('mobile-hidden')) {
-        sidebar.classList.remove('mobile-hidden');
-        $('canvasArea').classList.remove('mobile-full');
-        toast('参数面板已打开');
-      } else {
-        sidebar.classList.add('mobile-hidden');
-        $('canvasArea').classList.add('mobile-full');
-        toast('参数面板已隐藏');
-      }
-    });
 
     // ===================== CAMERA & GESTURE =====================
     let gestureRecognizer = null;
@@ -1027,6 +1648,7 @@
         setGestureUI('grab');
         S.isGrabbing = true;
         if (S.mode === 'gesture') {
+          // 3D Touch: palm position relative to camera center → direct tilt
           const cx = (px - 0.5) * 2 * S.sensitivity * 0.25;
           const cy = (py - 0.5) * 2 * S.sensitivity * 0.25;
           S.targetX = cx;
@@ -1044,22 +1666,24 @@
     function drawHand(lm, w, h) {
       const conn = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
 
+      // 白色骨骼连线
       gCtx.strokeStyle = 'rgba(255,255,255,0.85)';
       gCtx.lineWidth = 2.5;
       gCtx.shadowColor = 'rgba(255,255,255,0.4)';
       gCtx.shadowBlur = 4;
       conn.forEach(([a,b]) => {
         gCtx.beginPath();
-        gCtx.moveTo(lm[a].x * w, lm[a].y * h);
-        gCtx.lineTo(lm[b].x * w, lm[b].y * h);
+        gCtx.moveTo(lm[a].x*w, lm[a].y*h);
+        gCtx.lineTo(lm[b].x*w, lm[b].y*h);
         gCtx.stroke();
       });
       gCtx.shadowBlur = 0;
 
-      lm.forEach((p, i) => {
+      // 白色骨骼节点（圆点）
+      lm.forEach((p,i) => {
         const isTip = i % 4 === 0;
         gCtx.beginPath();
-        gCtx.arc(p.x * w, p.y * h, isTip ? 5 : 3.5, 0, Math.PI * 2);
+        gCtx.arc(p.x*w, p.y*h, isTip ? 5 : 3.5, 0, Math.PI*2);
         gCtx.fillStyle = 'rgba(255,255,255,0.9)';
         gCtx.shadowColor = 'rgba(255,255,255,0.5)';
         gCtx.shadowBlur = isTip ? 6 : 3;
@@ -1073,7 +1697,7 @@
       const name = $('gestureName');
       const hint = $('gestureHint');
       const icon = el.querySelector('.gesture-icon');
-      el.classList.remove('grab', 'release');
+      el.classList.remove('grab','release');
       if (type === 'grab') {
         el.classList.add('grab');
         icon.textContent = '\u270A';
@@ -1106,49 +1730,515 @@
     });
 
     $('depthScale').addEventListener('input', function() {
-      S.depthScale = parseFloat(this.value); $('depthScaleVal').textContent = this.value;
+      S.depthScale = parseFloat(this.value);
+      $('depthScaleVal').textContent = this.value;
       if (planeBack) applyDepthToGeometry(planeBack.geometry);
       if (planeFront) applyDepthToGeometry(planeFront.geometry);
     });
     $('depthBias').addEventListener('input', function() {
-      S.depthBias = parseFloat(this.value); $('depthBiasVal').textContent = this.value;
+      S.depthBias = parseFloat(this.value);
+      $('depthBiasVal').textContent = this.value;
       if (planeBack) applyDepthToGeometry(planeBack.geometry);
       if (planeFront) applyDepthToGeometry(planeFront.geometry);
     });
     $('depthContrast').addEventListener('input', function() {
-      S.depthContrast = parseFloat(this.value); $('depthContrastVal').textContent = this.value;
+      S.depthContrast = parseFloat(this.value);
+      $('depthContrastVal').textContent = this.value;
       if (planeBack) applyDepthToGeometry(planeBack.geometry);
       if (planeFront) applyDepthToGeometry(planeFront.geometry);
     });
     $('sensitivity').addEventListener('input', function() {
-      S.sensitivity = parseFloat(this.value); $('sensitivityVal').textContent = this.value;
+      S.sensitivity = parseFloat(this.value);
+      $('sensitivityVal').textContent = this.value;
     });
     $('damping').addEventListener('input', function() {
-      S.damping = parseFloat(this.value); $('dampingVal').textContent = this.value;
+      S.damping = parseFloat(this.value);
+      $('dampingVal').textContent = this.value;
     });
 
-    $('generateBtn').addEventListener('click', async () => { await runDepth(); });
+    $('generateBtn').addEventListener('click', async () => {
+      if (!S.imageReady) {
+        S.imageReady = true;
+        await runDepth();
+      } else {
+        await runDepth();
+      }
+    });
+
+    // AI refinement is always enabled; only automatic parameter selection is optional.
+    $('autoParamsToggle').addEventListener('change', function() {
+      S.autoParams = this.checked;
+      if (this.checked) applyAutoParams();
+      toast(this.checked ? '自动参数已开启' : '自动参数已关闭');
+    });
+
+    // ===================== AI MODELS =====================
+    let lamaModel = null, lamaProc = null;
+    let segformerModel = null, segformerProc = null;
+    let faceMesh = null;
+
+    // ADE20K class mapping to depth modulation
+    const ADE20K_DEPTH = {
+      // sky: far away, less parallax
+      2: -0.20,   // sky
+      // ground: moderate
+      3: 0.05,    // earth/ground
+      12: 0.05,   // floor
+      14: 0.05,   // road
+      // buildings: slight
+      1: 0.03,    // wall
+      25: 0.03,   // building
+      // vegetation: moderate
+      4: 0.08,    // tree
+      5: 0.08,    // plant
+      21: 0.08,   // grass
+      // water: far
+      26: -0.10,  // water/sea
+      60: -0.10,  // river
+      // person: closest, most parallax
+      13: 0.20,   // person
+      // furniture
+      7: 0.10,    // bed
+      19: 0.10,   // sofa
+      34: 0.10,   // chair
+      32: 0.10,   // table
+      // mountain
+      17: -0.05,  // mountain
+      // car
+      20: 0.12,   // car
+    };
+
+    function setAIStatus(type, state) {
+      const el = document.getElementById('ai' + type);
+      if (!el) return;
+      const dot = el.querySelector('.ai-dot');
+      dot.classList.remove('ready', 'loading');
+      if (state === 'ready') dot.classList.add('ready');
+      else if (state === 'loading') dot.classList.add('loading');
+    }
+
+    async function loadLaMa() {
+      if (lamaModel) return true;
+      try {
+        setAIStatus('Inpaint', 'loading');
+        const t = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        const { AutoModel, AutoProcessor } = t;
+        [lamaModel, lamaProc] = await Promise.all([
+          AutoModel.from_pretrained('Xenova/lama', {
+            device: 'wasm', dtype: 'fp32',
+            progress_callback: (p) => {
+              if (p.status === 'progress') $('loadingText').textContent = '正在下载背景修复模型... ' + Math.round(p.progress || 0) + '%';
+            }
+          }),
+          AutoProcessor.from_pretrained('Xenova/lama'),
+        ]);
+        setAIStatus('Inpaint', 'ready');
+        return true;
+      } catch (err) {
+        console.warn('LaMa load failed:', err);
+        setAIStatus('Inpaint', '');
+        return false;
+      }
+    }
+
+    async function loadSegFormer() {
+      if (segformerModel) return true;
+      try {
+        setAIStatus('Segment', 'loading');
+        const t = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        const { AutoModelForSemanticSegmentation, AutoProcessor } = t;
+        [segformerModel, segformerProc] = await Promise.all([
+          AutoModelForSemanticSegmentation.from_pretrained('Xenova/segformer-b0-finetuned-ade-512-512', {
+            device: 'wasm', dtype: 'fp32',
+            progress_callback: (p) => {
+              if (p.status === 'progress') $('loadingText').textContent = '正在下载语义分割模型... ' + Math.round(p.progress || 0) + '%';
+            }
+          }),
+          AutoProcessor.from_pretrained('Xenova/segformer-b0-finetuned-ade-512-512'),
+        ]);
+        setAIStatus('Segment', 'ready');
+        return true;
+      } catch (err) {
+        console.warn('SegFormer load failed:', err);
+        setAIStatus('Segment', '');
+        return false;
+      }
+    }
+
+    async function loadFaceMesh() {
+      if (faceMesh) return true;
+      try {
+        setAIStatus('Face', 'loading');
+        const mod = await import('https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@latest/face_mesh.mjs');
+        const { FaceMesh, FilesetResolver } = mod;
+        const fs = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');
+        faceMesh = new FaceMesh({
+          locateFile: (f) => 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@latest/' + f
+        });
+        faceMesh.setOptions({
+          maxNumFaces: 3,
+          refineLandmarks: true,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
+        await faceMesh.initialize();
+        setAIStatus('Face', 'ready');
+        return true;
+      } catch (err) {
+        console.warn('FaceMesh load failed:', err);
+        setAIStatus('Face', '');
+        return false;
+      }
+    }
+
+    // ===================== AI INFERENCE =====================
+    async function runLaMaInpainting(imageCanvas, alphaData, w, h) {
+      if (!S.aiEnhanced) return null;
+      const loaded = await loadLaMa();
+      if (!loaded) return null;
+
+      $('loadingText').textContent = '正在智能修复背景...';
+      try {
+        // Create mask: white = keep (background), black = inpaint (foreground area)
+        const maskCanvas = document.createElement('canvas');
+        maskCanvas.width = w; maskCanvas.height = h;
+        const mCtx = maskCanvas.getContext('2d');
+        const maskImg = mCtx.createImageData(w, h);
+        for (let i = 0; i < alphaData.length; i++) {
+          const pi = i * 4;
+          const a = alphaData[i];
+          // Areas with high alpha (foreground) need inpainting → black in mask
+          // Areas with low alpha (background) keep → white in mask
+          const maskVal = a > 0.5 ? 0 : 255;
+          maskImg.data[pi] = maskImg.data[pi + 1] = maskImg.data[pi + 2] = maskVal;
+          maskImg.data[pi + 3] = 255;
+        }
+        mCtx.putImageData(maskImg, 0, 0);
+
+        const { RawImage } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        const imgRaw = RawImage.fromCanvas(imageCanvas);
+        const maskRaw = RawImage.fromCanvas(maskCanvas);
+
+        const inputs = await lamaProc(imgRaw, maskRaw);
+        const { output } = await lamaModel(inputs);
+        const resultCanvas = output.toCanvas();
+
+        S.inpaintReady = true;
+        return resultCanvas;
+      } catch (err) {
+        console.warn('LaMa inference failed:', err);
+        return null;
+      }
+    }
+
+    async function runSegFormer(imageCanvas) {
+      if (!S.aiEnhanced) return null;
+      const loaded = await loadSegFormer();
+      if (!loaded) return null;
+
+      $('loadingText').textContent = '正在语义分割...';
+      try {
+        const { RawImage } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+        const imgRaw = RawImage.fromCanvas(imageCanvas);
+        const inputs = await segformerProc(imgRaw);
+        const { logits } = await segformerModel(inputs);
+        // logits shape: [1, 150, H/4, W/4] → get class IDs
+        const squeezed = logits.squeeze_(0); // [150, H, W]
+        const [numClasses, segH, segW] = squeezed.dims;
+        const classData = new Uint8Array(segH * segW);
+        for (let i = 0; i < segH * segW; i++) {
+          let maxVal = -Infinity, maxIdx = 0;
+          for (let c = 0; c < numClasses; c++) {
+            const val = squeezed.data[c * segH * segW + i];
+            if (val > maxVal) { maxVal = val; maxIdx = c; }
+          }
+          classData[i] = maxIdx;
+        }
+
+        S.segmentationData = classData;
+        S.segmentationDims = [segH, segW];
+        S.segmentReady = true;
+        setAIStatus('Segment', 'ready');
+        return classData;
+      } catch (err) {
+        console.warn('SegFormer inference failed:', err);
+        return null;
+      }
+    }
+
+    async function runFaceMesh(imageCanvas) {
+      if (!S.aiEnhanced) return null;
+      const loaded = await loadFaceMesh();
+      if (!loaded) return null;
+
+      $('loadingText').textContent = '正在检测人脸...';
+      try {
+        const results = await faceMesh.send({ image: imageCanvas });
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+          S.faceLandmarks = results.multiFaceLandmarks;
+          S.faceReady = true;
+          setAIStatus('Face', 'ready');
+          return results.multiFaceLandmarks;
+        }
+        // No face detected, mark as ready anyway (nothing to do)
+        S.faceReady = true;
+        setAIStatus('Face', 'ready');
+        return null;
+      } catch (err) {
+        console.warn('FaceMesh inference failed:', err);
+        S.faceReady = true;
+        setAIStatus('Face', 'ready');
+        return null;
+      }
+    }
+
+    // ===================== ADAPTIVE PARAMS =====================
+    function applyDepthAutoParams() {
+      if (!S.depthCanvas) return;
+      const probe = document.createElement('canvas');
+      probe.width = 64; probe.height = 64;
+      const probeCtx = probe.getContext('2d', { willReadFrequently: true });
+      probeCtx.drawImage(S.depthCanvas, 0, 0, probe.width, probe.height);
+      const px = probeCtx.getImageData(0, 0, probe.width, probe.height).data;
+      const depths = [];
+      const grid = new Float32Array(probe.width * probe.height);
+      let centerSum = 0, edgeSum = 0, centerCount = 0, edgeCount = 0;
+      for (let y = 0; y < probe.height; y++) {
+        for (let x = 0; x < probe.width; x++) {
+          const d = 1 - px[(y * probe.width + x) * 4] / 255;
+          depths.push(d);
+          grid[y * probe.width + x] = d;
+          const isCenter = x > 18 && x < 46 && y > 12 && y < 52;
+          if (isCenter) { centerSum += d; centerCount++; }
+          else { edgeSum += d; edgeCount++; }
+        }
+      }
+      depths.sort((a, b) => a - b);
+      const spread = depths[Math.floor(depths.length * 0.90)] - depths[Math.floor(depths.length * 0.10)];
+      const centerLead = centerSum / centerCount - edgeSum / edgeCount;
+      const aspect = S.imageCanvas
+        ? S.imageCanvas.width / S.imageCanvas.height
+        : (uploadPreview.naturalWidth || 1) / (uploadPreview.naturalHeight || 1);
+      let depthEdgeSum = 0, depthEdgeCount = 0;
+      for (let y = 1; y < probe.height; y++) for (let x = 1; x < probe.width; x++) {
+        const i = y * probe.width + x;
+        depthEdgeSum += Math.abs(grid[i] - grid[i - 1]) + Math.abs(grid[i] - grid[i - probe.width]);
+        depthEdgeCount += 2;
+      }
+      const depthDetail = depthEdgeSum / Math.max(1, depthEdgeCount);
+      const middle = depths[Math.floor(depths.length * 0.50)];
+      const lowerTail = middle - depths[Math.floor(depths.length * 0.15)];
+      const upperTail = depths[Math.floor(depths.length * 0.85)] - middle;
+      let preset;
+      if (spread < 0.12) {
+        preset = { depthScale: 0.38, depthBias: 0.02, depthContrast: 1.0, sensitivity: 0.65, damping: 0.90, label: '平面画面' };
+      } else if (centerLead > 0.08 && aspect < 1.25) {
+        preset = { depthScale: 0.88, depthBias: 0.08, depthContrast: 1.12, sensitivity: 1.05, damping: 0.88, label: '中心主体' };
+      } else if (spread > 0.42) {
+        preset = { depthScale: 0.72, depthBias: 0.04, depthContrast: 1.28, sensitivity: 0.92, damping: 0.87, label: '层次丰富' };
+      } else {
+        preset = { depthScale: 0.60, depthBias: 0.05, depthContrast: 1.10, sensitivity: 0.85, damping: 0.89, label: '自然景深' };
+      }
+      // Use the analysis as continuous signals, not as a final fixed preset.
+      // Depth models normally stretch every image to a similar 0–1 range, so
+      // percentiles alone cannot distinguish a portrait from a flat scene.
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const focus = clamp(centerLead / Math.max(spread, 0.08), -0.65, 0.65);
+      const portraitBoost = aspect < 0.88 ? 0.09 : (aspect > 1.55 ? -0.05 : 0);
+      const balance = clamp((upperTail - lowerTail) / Math.max(spread, 0.08), -0.45, 0.45);
+      preset = {
+        depthScale: clamp(0.40 + depthDetail * 3.6 + focus * 0.34 + portraitBoost, 0.28, 1.10),
+        depthBias: clamp(0.025 + balance * 0.15, -0.06, 0.14),
+        depthContrast: clamp(0.92 + depthDetail * 4.2 - focus * 0.10, 0.82, 1.55),
+        sensitivity: clamp(0.60 + depthDetail * 2.0 + focus * 0.18, 0.55, 1.25),
+        damping: clamp(0.91 - depthDetail * 0.32, 0.84, 0.92),
+        label: 'continuous depth analysis',
+      };
+      S.depthScale = preset.depthScale;
+      S.depthBias = preset.depthBias;
+      S.depthContrast = preset.depthContrast;
+      S.sensitivity = preset.sensitivity;
+      S.damping = preset.damping;
+      $('depthScale').value = preset.depthScale; $('depthScaleVal').textContent = preset.depthScale.toFixed(2);
+      $('depthBias').value = preset.depthBias; $('depthBiasVal').textContent = preset.depthBias.toFixed(2);
+      $('depthContrast').value = preset.depthContrast; $('depthContrastVal').textContent = preset.depthContrast.toFixed(2);
+      $('sensitivity').value = preset.sensitivity; $('sensitivityVal').textContent = preset.sensitivity.toFixed(2);
+      $('damping').value = preset.damping; $('dampingVal').textContent = preset.damping.toFixed(2);
+      if (planeBack) applyDepthToGeometry(planeBack.geometry);
+      if (planeFront) applyDepthToGeometry(planeFront.geometry);
+    }
+
+    function applyAutoParams() {
+      if (!S.segmentationData || !S.segmentationDims) {
+        applyDepthAutoParams();
+        return;
+      }
+
+      const [segH, segW] = S.segmentationDims;
+      const total = segH * segW;
+      let personRatio = 0, skyRatio = 0, buildingRatio = 0, vegetationRatio = 0, waterRatio = 0;
+
+      for (let i = 0; i < total; i++) {
+        const cls = S.segmentationData[i];
+        if (cls === 13) personRatio++;
+        else if (cls === 2) skyRatio++;
+        else if (cls === 1 || cls === 25) buildingRatio++;
+        else if (cls === 4 || cls === 5 || cls === 21) vegetationRatio++;
+        else if (cls === 26 || cls === 60) waterRatio++;
+      }
+
+      personRatio /= total; skyRatio /= total; buildingRatio /= total;
+      vegetationRatio /= total; waterRatio /= total;
+
+      let preset;
+      if (personRatio > 0.15) {
+        preset = { depthScale: 0.92, depthBias: 0.12, depthContrast: 1.15, sensitivity: 1.1, damping: 0.88, label: '人像' };
+      } else if (skyRatio > 0.15 && vegetationRatio > 0.10) {
+        preset = { depthScale: 0.62, depthBias: 0.06, depthContrast: 1.30, sensitivity: 0.9, damping: 0.86, label: '风景' };
+      } else if (waterRatio > 0.15 || (skyRatio > 0.1 && waterRatio > 0.05)) {
+        preset = { depthScale: 0.42, depthBias: 0.04, depthContrast: 1.08, sensitivity: 0.7, damping: 0.88, label: '水面' };
+      } else if (buildingRatio > 0.15) {
+        preset = { depthScale: 0.72, depthBias: 0.03, depthContrast: 1.42, sensitivity: 1.0, damping: 0.87, label: '建筑' };
+      } else {
+        preset = { depthScale: 0.70, depthBias: 0.06, depthContrast: 1.12, sensitivity: 1.0, damping: 0.87, label: '默认' };
+      }
+
+      S.depthScale = preset.depthScale;
+      S.depthBias = preset.depthBias;
+      S.depthContrast = preset.depthContrast;
+      S.sensitivity = preset.sensitivity;
+      S.damping = preset.damping;
+
+      // Update UI
+      $('depthScale').value = preset.depthScale;
+      $('depthScaleVal').textContent = preset.depthScale;
+      $('depthBias').value = preset.depthBias;
+      $('depthBiasVal').textContent = preset.depthBias;
+      $('depthContrast').value = preset.depthContrast;
+      $('depthContrastVal').textContent = preset.depthContrast;
+      $('sensitivity').value = preset.sensitivity;
+      $('sensitivityVal').textContent = preset.sensitivity;
+      $('damping').value = preset.damping;
+      $('dampingVal').textContent = preset.damping;
+
+      // Update shader uniforms if planes exist
+      if (planeBack) applyDepthToGeometry(planeBack.geometry);
+      if (planeFront) applyDepthToGeometry(planeFront.geometry);
+
+      toast('自动参数已应用: ' + preset.label + '模式');
+    }
+
+    // ===================== DEPTH ENHANCEMENT =====================
+    function enhanceDepthWithFace(depthMap, w, h, faceLandmarksArr) {
+      if (!faceLandmarksArr || faceLandmarksArr.length === 0) return depthMap;
+
+      const dCtx = depthMap.getContext('2d');
+      const dData = dCtx.getImageData(0, 0, w, h);
+      const enhanced = new Uint8ClampedArray(dData.data);
+
+      for (const faceLM of faceLandmarksArr) {
+        // Get face bounding box from landmarks
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (const lm of faceLM) {
+          const x = lm.x * w, y = lm.y * h;
+          if (x < minX) minX = x; if (y < minY) minY = y;
+          if (x > maxX) maxX = x; if (y > maxY) maxY = y;
+        }
+
+        const cx = faceLM[1].x * w;   // nose tip
+        const cy = faceLM[1].y * h;
+        const faceW = (maxX - minX) * 1.2;
+        const faceH = (maxY - minY) * 1.2;
+        const radius = Math.max(faceW, faceH) / 2;
+
+        // Apply depth gradient: nose (closest) → face edges (further)
+        for (let y = Math.max(0, Math.floor(minY - faceH * 0.3)); y < Math.min(h, Math.ceil(maxY + faceH * 0.3)); y++) {
+          for (let x = Math.max(0, Math.floor(minX - faceW * 0.3)); x < Math.min(w, Math.ceil(maxX + faceW * 0.3)); x++) {
+            const dx = (x - cx) / radius;
+            const dy = (y - cy) / radius;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > 1.5) continue;
+
+            // Gaussian falloff: center gets more depth (closer), edges get less
+            const factor = Math.exp(-dist * dist * 1.5) * 0.35;
+            const pi = (y * w + x) * 4;
+            const orig = enhanced[pi]; // R channel of depth = depth value
+            enhanced[pi] = Math.min(255, Math.max(0, orig + factor * 255));
+            enhanced[pi + 1] = enhanced[pi];
+            enhanced[pi + 2] = enhanced[pi];
+          }
+        }
+      }
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = w; outCanvas.height = h;
+      const outCtx = outCanvas.getContext('2d');
+      const outImg = outCtx.createImageData(w, h);
+      outImg.data.set(enhanced);
+      outCtx.putImageData(outImg, 0, 0);
+      return outCanvas;
+    }
+
+    function buildSemanticDepthMap(depthCanvas, w, h) {
+      if (!S.segmentationData || !S.segmentationDims) return depthCanvas;
+
+      const [segH, segW] = S.segmentationDims;
+      const dCtx = depthCanvas.getContext('2d');
+      const dData = dCtx.getImageData(0, 0, w, h);
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = w; outCanvas.height = h;
+      const outCtx = outCanvas.getContext('2d');
+      const outImg = outCtx.createImageData(w, h);
+      outImg.data.set(dData.data);
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const sx = Math.floor(x / w * segW);
+          const sy = Math.floor(y / h * segH);
+          const cls = S.segmentationData[sy * segW + sx];
+          const modulation = ADE20K_DEPTH[cls] || 0;
+
+          if (modulation !== 0) {
+            const pi = (y * w + x) * 4;
+            const orig = dData.data[pi];
+            const newVal = Math.min(255, Math.max(0, orig + modulation * 255));
+            outImg.data[pi] = newVal;
+            outImg.data[pi + 1] = newVal;
+            outImg.data[pi + 2] = newVal;
+          }
+        }
+      }
+
+      outCtx.putImageData(outImg, 0, 0);
+      return outCanvas;
+    }
+
     $('resetBtn').addEventListener('click', () => {
-      S.targetX = 0; S.targetY = 0; S.currentX = 0; S.currentY = 0;
-      S.gyroBeta0 = null; S.gyroGamma0 = null;
-      toast('视角已重置');
+      S.targetX = 0; S.targetY = 0;
+      S.currX = 0; S.currY = 0;
+      S.isGrabbing = false;
     });
 
-    // Resize handler
-    window.addEventListener('resize', () => {
-      if (!S.depthReady || !renderer) return;
-      const containerW = $('canvasArea').clientWidth;
-      const containerH = $('canvasArea').clientHeight;
-      const aspect = S.imageW / S.imageH;
-      const renderW = Math.min(containerW, containerH * aspect);
-      const renderH = renderW / aspect;
-      renderer.setSize(renderW, renderH, false);
-      threeCanvas.style.width = renderW + 'px';
-      threeCanvas.style.height = renderH + 'px';
-    });
+    // ===================== HELPERS =====================
+    function showLoad(t, h) {
+      $('loadingText').textContent = t;
+      $('loadingHint').textContent = h || '';
+      $('loadingOverlay').classList.add('visible');
+    }
+    function hideLoad() { $('loadingOverlay').classList.remove('visible'); }
 
-    // Init
-    toast(isMobile ? '手机端：上传图片后点击生成，使用陀螺仪或触摸控制视角' : '上传图片开始体验 2.5D 效果');
+    let toastTimer;
+    function toast(msg) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('visible'), 3000);
+    }
+
+    // ===================== INIT =====================
+    initThree();
   </script>
 </body>
 </html>
