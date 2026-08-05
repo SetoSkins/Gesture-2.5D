@@ -287,9 +287,10 @@
       .panel-camera { display: none; }
     }
     @media (max-width: 600px) {
-      .main { flex-direction: column; }
-      .sidebar { width: 100%; min-width: auto; flex: 1; max-height: none; border-right: none; border-bottom: none; }
-      .canvas-area { order: -1; flex: none; height: 34vh; min-height: 240px; border-bottom: 1px solid var(--rule); }
+      body { overflow: auto; }
+      .main { flex-direction: column; height: auto; min-height: 100vh; }
+      .sidebar { width: 100%; min-width: auto; flex: none; max-height: none; border-right: none; border-bottom: none; }
+      .canvas-area { order: -1; flex: none; width: 100%; min-height: 240px; border-bottom: 1px solid var(--rule); }
       .canvas-area.mobile-hidden { display: none; }
       .header-actions { display: none; }
       .panel-camera { display: none; }
@@ -768,6 +769,11 @@
 
     function resize() {
       updateMobileLayout();
+      if (isMobileViewport() && S.depthReady) {
+        const img = uploadPreview;
+        const asp = (img.naturalWidth || img.width) / (img.naturalHeight || img.height);
+        canvasArea.style.height = (canvasArea.clientWidth / asp) + 'px';
+      }
       const r = canvasArea.getBoundingClientRect();
       if (!r.width || !r.height) return;
       renderer.setSize(r.width, r.height);
@@ -1610,6 +1616,11 @@
       $('welcomeScreen').style.display = 'none';
       threeCanvas.style.display = 'block';
       $('hud').style.display = 'flex';
+      if (isMobileViewport()) {
+        const img = uploadPreview;
+        const asp = (img.naturalWidth || img.width) / (img.naturalHeight || img.height);
+        canvasArea.style.height = (canvasArea.clientWidth / asp) + 'px';
+      }
       updateMobileLayout();
       resize();
       buildPlane(uploadPreview, S.depthCanvas);
