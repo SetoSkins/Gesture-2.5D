@@ -303,7 +303,7 @@
       .panel { padding: 14px; }
       .panel-title { margin-bottom: 10px; }
       .btn { padding: 10px 16px; font-size: 13px; }
-      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
+      .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; display: none !important; }
       .welcome { display: none; }
     }
 
@@ -1552,6 +1552,7 @@
     async function runDepth() {
       if (!S.imageReady) return;
       if (!S.modelLoaded) { if (!await loadModel()) return; }
+      toast('生成中.....请等待30秒', 30000);
       showLoad('正在生成深度图...', '');
       try {
         const { RawImage } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
@@ -1875,7 +1876,6 @@
     });
 
     $('generateBtn').addEventListener('click', async () => {
-      toast('生成中.....请等待30秒', 30000);
       if (!S.imageReady) {
         S.imageReady = true;
         await runDepth();
