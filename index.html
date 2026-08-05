@@ -191,17 +191,17 @@
     .gesture-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
     /* Mode switch */
-    .mode-switch {
+    .mode-switch, .mobile-mode-switch {
       display: flex; background: var(--bg); border-radius: 8px;
       padding: 3px; border: 1px solid var(--rule);
     }
-    .mode-option {
+    .mode-option, .mobile-mode-option {
       flex: 1; padding: 8px 12px; text-align: center;
       font-size: 12px; font-weight: 600; color: var(--muted);
       cursor: pointer; border-radius: 6px; transition: all 0.2s ease;
     }
-    .mode-option.active { background: var(--accent); color: white; }
-    .mode-option:hover:not(.active) { color: var(--ink); }
+    .mode-option.active, .mobile-mode-option.active { background: var(--accent); color: white; }
+    .mode-option:hover:not(.active), .mobile-mode-option:hover:not(.active) { color: var(--ink); }
 
     /* Canvas Area */
     .canvas-area {
@@ -209,7 +209,10 @@
       display: flex; align-items: center; justify-content: center;
       background: var(--bg); overflow: hidden;
     }
+    .canvas-area.mobile-hidden { display: none; }
     .canvas-area canvas { display: block; }
+
+    .mobile-only { display: none; }
 
     /* Welcome */
     .welcome { text-align: center; max-width: 480px; padding: 40px; }
@@ -285,9 +288,13 @@
     }
     @media (max-width: 600px) {
       .main { flex-direction: column; }
-      .sidebar { width: 100%; min-width: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid var(--rule); }
+      .sidebar { width: 100%; min-width: auto; flex: 1; max-height: none; border-right: none; border-bottom: none; }
+      .canvas-area { order: -1; flex: none; height: 34vh; min-height: 240px; border-bottom: 1px solid var(--rule); }
+      .canvas-area.mobile-hidden { display: none; }
       .header-actions { display: none; }
       .panel-camera { display: none; }
+      .panel-ai { display: none; }
+      .mobile-only { display: block; }
       .welcome { padding: 24px 16px; }
       .welcome h2 { font-size: 18px; }
       .welcome p { font-size: 13px; }
@@ -297,6 +304,7 @@
       .panel-title { margin-bottom: 10px; }
       .btn { padding: 10px 16px; font-size: 13px; }
       .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
+      .welcome { display: none; }
     }
 
     /* Toggle Switch */
@@ -344,6 +352,14 @@
 
   <main class="main">
     <aside class="sidebar">
+      <div class="panel mobile-only" id="mobileControlPanel" style="display:none;">
+        <div class="panel-title"><span>&#128241;</span> 控制方式</div>
+        <div class="mobile-mode-switch">
+          <div class="mobile-mode-option active" data-mobile-mode="touch">触摸控制</div>
+          <div class="mobile-mode-option" data-mobile-mode="gyro">陀螺仪</div>
+        </div>
+      </div>
+
       <!-- Upload -->
       <div class="panel">
         <div class="panel-title"><span>&#128444;</span> 上传图片</div>
@@ -414,7 +430,7 @@
       </div>
 
       <!-- AI Features -->
-      <div class="panel">
+      <div class="panel panel-ai">
         <div class="panel-title"><span>&#129302;</span> AI 增强</div>
         <div class="control-group" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <span style="font-size:13px;color:var(--ink);">自动参数</span>
@@ -519,6 +535,7 @@
     const uploadPreview= $('uploadPreview');
     const canvasArea   = $('canvasArea');
     const threeCanvas  = $('threeCanvas');
+    const mobileControlPanel = $('mobileControlPanel');
     const webcam       = $('webcam');
     const gestureCv    = $('gestureCanvas');
     const gCtx         = gestureCv.getContext('2d');
@@ -750,7 +767,9 @@
     }
 
     function resize() {
+      updateMobileLayout();
       const r = canvasArea.getBoundingClientRect();
+      if (!r.width || !r.height) return;
       renderer.setSize(r.width, r.height);
       camera.aspect = r.width / r.height;
       camera.updateProjectionMatrix();
@@ -1314,12 +1333,35 @@
       S.targetY = clamp((beta - 45) / 42, -1, 1) * S.sensitivity * -0.18;
     }
 
+    function disableGyroscope() {
+      if (!S.gyroActive) return;
+      window.removeEventListener('deviceorientation', onDeviceTilt);
+      S.gyroActive = false;
+    }
+
+    function updateModeUI() {
+      document.querySelectorAll('.mode-option').forEach(o => o.classList.toggle('active', o.dataset.mode === S.mode));
+      document.querySelectorAll('.mobile-mode-option').forEach(o => o.classList.toggle('active', o.dataset.mobileMode === S.mode));
+    }
+
+    function setInteractionMode(mode, { silent = false } = {}) {
+      if (mode !== 'gyro') disableGyroscope();
+      S.mode = mode;
+      S.isGrabbing = false;
+      S.targetX = 0;
+      S.targetY = 0;
+      updateModeUI();
+      if (silent) return;
+      if (mode === 'mouse') toast('已切换到鼠标控制，悬停画面控制视角');
+      else if (mode === 'gesture') toast('已切换到手势控制模式');
+      else if (mode === 'touch') toast('已切换到触摸控制，滑动画面控制视角');
+    }
+
     function enableGyroscope() {
-      if (S.gyroActive) return;
-      S.mode = 'gyro';
+      if (!S.gyroActive) window.addEventListener('deviceorientation', onDeviceTilt, { passive: true });
       S.gyroActive = true;
-      window.addEventListener('deviceorientation', onDeviceTilt, { passive: true });
-      toast('已启用陀螺仪控制，倾斜手机可查看 3D 效果');
+      setInteractionMode('gyro', { silent: true });
+      toast('已切换到陀螺仪控制，倾斜手机可查看 3D 效果');
     }
 
     function setupMobileGyroscope() {
@@ -1341,6 +1383,42 @@
       }
     }
 
+    async function activateGyroscopeMode() {
+      if (!isMobileViewport()) return;
+      if (!('DeviceOrientationEvent' in window)) {
+        toast('当前设备不支持陀螺仪控制');
+        return;
+      }
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const granted = await DeviceOrientationEvent.requestPermission();
+          if (granted !== 'granted') {
+            toast('未获得陀螺仪权限，无法使用手机倾斜控制');
+            updateModeUI();
+            return;
+          }
+        } catch (_) {
+          toast('陀螺仪权限请求失败');
+          updateModeUI();
+          return;
+        }
+      }
+      enableGyroscope();
+    }
+
+    function updateMobileLayout() {
+      const mobile = isMobileViewport();
+      canvasArea.classList.toggle('mobile-hidden', mobile && !S.depthReady);
+      if (mobileControlPanel) mobileControlPanel.style.display = mobile && S.depthReady ? 'block' : 'none';
+      if (mobile && S.depthReady && !['touch', 'gyro'].includes(S.mode)) {
+        setInteractionMode('touch', { silent: true });
+      }
+      if (!mobile && ['touch', 'gyro'].includes(S.mode)) {
+        setInteractionMode('gesture', { silent: true });
+      }
+      updateModeUI();
+    }
+
     // ===================== MOUSE MODE =====================
     canvasArea.addEventListener('mousemove', (e) => {
       if (S.mode !== 'mouse' || !S.depthReady) return;
@@ -1356,6 +1434,39 @@
     });
     canvasArea.addEventListener('mouseleave', () => {
       if (S.mode === 'mouse') { S.targetX = 0; S.targetY = 0; S.isGrabbing = false; }
+    });
+    canvasArea.addEventListener('touchstart', (e) => {
+      if (S.mode !== 'touch' || !S.depthReady || !isMobileViewport()) return;
+      e.preventDefault();
+      const rect = canvasArea.getBoundingClientRect();
+      const t = e.touches[0];
+      const cx = (t.clientX - rect.left) / rect.width;
+      const cy = (t.clientY - rect.top) / rect.height;
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      S.targetX = clamp((cx - 0.5) * 2, -1, 1) * S.sensitivity * 0.22;
+      S.targetY = clamp((0.5 - cy) * 2, -1, 1) * S.sensitivity * 0.22;
+      S.isGrabbing = true;
+    }, { passive: false });
+    canvasArea.addEventListener('touchmove', (e) => {
+      if (S.mode !== 'touch' || !S.depthReady || !isMobileViewport()) return;
+      e.preventDefault();
+      const rect = canvasArea.getBoundingClientRect();
+      const t = e.touches[0];
+      const cx = (t.clientX - rect.left) / rect.width;
+      const cy = (t.clientY - rect.top) / rect.height;
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      S.targetX = clamp((cx - 0.5) * 2, -1, 1) * S.sensitivity * 0.22;
+      S.targetY = clamp((0.5 - cy) * 2, -1, 1) * S.sensitivity * 0.22;
+      S.isGrabbing = true;
+    }, { passive: false });
+    ['touchend', 'touchcancel'].forEach(evt => {
+      canvasArea.addEventListener(evt, () => {
+        if (S.mode === 'touch') {
+          S.targetX = 0;
+          S.targetY = 0;
+          S.isGrabbing = false;
+        }
+      }, { passive: true });
     });
 
     // ===================== FILE UPLOAD =====================
@@ -1393,9 +1504,12 @@
       $('depthStatus').style.display = 'none';
       $('depthStatus').classList.remove('done');
       $('hudDepth').classList.replace('on', 'off');
+      disableGyroscope();
+      S.mode = isMobileViewport() ? 'touch' : 'gesture';
       threeCanvas.style.display = 'none';
       $('welcomeScreen').style.display = 'block';
       $('hud').style.display = 'none';
+      updateMobileLayout();
       const url = URL.createObjectURL(file);
       S.imageUrl = url;
       const img = new Image();
@@ -1476,12 +1590,12 @@
         $('depthStatusText').textContent = '深度图生成完成';
         $('hudDepth').classList.replace('off', 'on');
 
+        S.depthReady = true;
         hideLoad();
         // Render as soon as the essential depth model finishes.  Secondary AI
         // models enhance the image in the background and never block the result.
         showScene();
-        S.depthReady = true;
-        toast('2.5D 效果生成完成！试试手势或鼠标控制视角');
+        toast(isMobileViewport() ? '2.5D 效果生成完成！可在下方切换陀螺仪或触摸控制' : '2.5D 效果生成完成！试试手势或鼠标控制视角');
         if (S.aiEnhanced) enhanceSceneAI(image, w, h);
         return;
       } catch (err) {
@@ -1495,6 +1609,7 @@
       $('welcomeScreen').style.display = 'none';
       threeCanvas.style.display = 'block';
       $('hud').style.display = 'flex';
+      updateMobileLayout();
       resize();
       buildPlane(uploadPreview, S.depthCanvas);
       tick();
@@ -1721,11 +1836,14 @@
     // ===================== UI BINDINGS =====================
     document.querySelectorAll('.mode-option').forEach(el => {
       el.addEventListener('click', () => {
-        S.mode = el.dataset.mode;
-        document.querySelectorAll('.mode-option').forEach(o => o.classList.toggle('active', o.dataset.mode === S.mode));
-        S.isGrabbing = false;
-        S.targetX = 0; S.targetY = 0;
-        toast(S.mode === 'mouse' ? '已切换到鼠标控制，悬停画面控制视角' : '已切换到手势控制模式');
+        setInteractionMode(el.dataset.mode);
+      });
+    });
+    document.querySelectorAll('.mobile-mode-option').forEach(el => {
+      el.addEventListener('click', async () => {
+        const nextMode = el.dataset.mobileMode;
+        if (nextMode === 'gyro') await activateGyroscopeMode();
+        else setInteractionMode('touch');
       });
     });
 
@@ -2239,6 +2357,7 @@
 
     // ===================== INIT =====================
     initThree();
+    updateMobileLayout();
   </script>
 </body>
 </html>
