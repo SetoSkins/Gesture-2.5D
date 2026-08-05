@@ -296,6 +296,7 @@
       z-index: 90; padding: 8px 12px;
       padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
+    .mobile-controls-bar.visible { display: flex; gap: 8px; }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -320,7 +321,6 @@
       .welcome-steps { flex-direction: column; gap: 10px; }
       .hud { bottom: 10px; padding: 8px 14px; font-size: 11px; gap: 10px; }
       .btn { padding: 10px 16px; font-size: 13px; }
-      .mobile-controls-bar { display: flex; gap: 8px; }
       .mobile-ctrl-btn {
         flex: 1; padding: 10px 12px; border-radius: 10px;
         font-size: 12px; font-weight: 600; text-align: center;
@@ -331,6 +331,8 @@
       .mobile-ctrl-btn.gyro-active { background: var(--accent2); color: var(--bg); border-color: var(--accent2); }
       .sidebar.mobile-collapsed .panel:not(.panel-upload):not(.panel-generate) { display: none; }
       .sidebar.mobile-collapsed .panel-generate { border-bottom: none; }
+      .sidebar.mobile-hidden { display: none; }
+      .canvas-area.mobile-full { flex: 1; min-height: 0; }
     }
 
     @media (min-width: 769px) {
@@ -347,7 +349,7 @@
     </div>
     <div class="header-actions">
       <div class="mode-switch" id="modeSwitch">
-        <div class="mode-option active" data-mode="gesture">手势控制</div>
+        <div class="mode-option" data-mode="gesture">手势控制</div>
         <div class="mode-option" data-mode="mouse">鼠标控制</div>
       </div>
     </div>
@@ -478,7 +480,7 @@
 
   <!-- Mobile bottom controls bar -->
   <div class="mobile-controls-bar" id="mobileBar">
-    <div class="mobile-ctrl-btn active" id="mbGyro" title="陀螺仪">陀螺仪</div>
+    <div class="mobile-ctrl-btn gyro-active" id="mbGyro" title="陀螺仪">陀螺仪</div>
     <div class="mobile-ctrl-btn" id="mbTouch" title="触摸">触摸</div>
     <div class="mobile-ctrl-btn" id="mbParams" title="参数">参数</div>
   </div>
@@ -507,7 +509,7 @@
       isGrabbing: false,
       targetX: 0, targetY: 0,
       currentX: 0, currentY: 0,
-      mode: 'gesture',
+      mode: isMobile ? 'gesture' : 'mouse',
       depthScale: 0.70,
       depthBias: 0.25,
       depthContrast: 1.0,
@@ -580,6 +582,10 @@
     // ===================== DEPTH =====================
     async function runDepth() {
       if (!S.image) return;
+
+      // On mobile, pre-enable gyro while user gesture is active (iOS requires it)
+      if (isMobile) enableGyro();
+
       showLoading('正在生成深度图...', '使用 AI 模型分析图像深度');
       $('depthStatus').style.display = 'flex';
       $('depthStatus').classList.remove('done');
@@ -707,8 +713,10 @@
       $('hud').style.display = 'flex';
 
       if (isMobile) {
-        $('sidebar').classList.remove('mobile-collapsed');
-        $('canvasArea').style.flex = '1';
+        $('sidebar').classList.add('mobile-hidden');
+        $('canvasArea').classList.add('mobile-full');
+        $('mobileBar').classList.add('visible');
+        enableGyro();
       }
 
       threeCanvas.style.width = renderW + 'px';
@@ -863,7 +871,16 @@
       toast('触摸模式，手指滑动控制视角');
     });
     $('mbParams').addEventListener('click', () => {
-      $('sidebar').classList.toggle('mobile-collapsed');
+      const sidebar = $('sidebar');
+      if (sidebar.classList.contains('mobile-hidden')) {
+        sidebar.classList.remove('mobile-hidden');
+        $('canvasArea').classList.remove('mobile-full');
+        toast('参数面板已打开');
+      } else {
+        sidebar.classList.add('mobile-hidden');
+        $('canvasArea').classList.add('mobile-full');
+        toast('参数面板已隐藏');
+      }
     });
 
     // ===================== CAMERA & GESTURE =====================
@@ -1089,7 +1106,9 @@
     });
 
     // Init
-    toast(isMobile ? '手机端：上传图片后点击生成，使用陀螺仪或触摸控制视角' : '上传图片开始体验 2.5D 效果');
+    // Set default mode switch UI based on platform
+    document.querySelectorAll('.mode-option').forEach(o => o.classList.toggle('active', o.dataset.mode === S.mode));
+    toast(isMobile ? '手机端：上传图片后点击生成，使用陀螺仪或触摸控制视角' : '鼠标悬停画布即可控制视角');
   </script>
 </body>
 </html>
